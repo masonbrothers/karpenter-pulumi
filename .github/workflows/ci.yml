@@ -25,11 +25,13 @@ jobs:
           node-version: 22
           cache: pnpm
           cache-dependency-path: package/pnpm-lock.yaml
-      - uses: actions/setup-go@v5
-        with:
-          cache: false
-          go-version: "1.26.x"
-      - run: go install github.com/pulumi/crd2pulumi@v1.6.2
+      - run: |
+          curl -sSLO https://github.com/pulumi/crd2pulumi/releases/download/v1.6.2/checksums.txt
+          curl -sSLO https://github.com/pulumi/crd2pulumi/releases/download/v1.6.2/crd2pulumi-v1.6.2-linux-amd64.tar.gz
+          grep ' crd2pulumi-v1.6.2-linux-amd64.tar.gz$' checksums.txt | sha256sum -c -
+          tar -xzf crd2pulumi-v1.6.2-linux-amd64.tar.gz crd2pulumi
+          sudo mv crd2pulumi /usr/local/bin/crd2pulumi
+          crd2pulumi --help >/dev/null
       - run: pnpm install --frozen-lockfile
         working-directory: package
       - run: pnpm generate:crds
