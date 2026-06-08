@@ -32,13 +32,19 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           cache: false
-          go-version: "1.24.x"
-      - run: go install github.com/pulumi/crd2pulumi@v1.4.0
+          go-version: "1.26.x"
+      - run: go install github.com/pulumi/crd2pulumi@v1.6.2
       - run: pnpm install --frozen-lockfile
         working-directory: package
       - run: pnpm generate:crds
         working-directory: package
       - run: git diff --exit-code
+        working-directory: package
+      - uses: helm/kind-action@v1.14.0
+        with:
+          cluster_name: crd-smoke
+          wait: 90s
+      - run: pnpm test:kind
         working-directory: package
       - run: pnpm typecheck
         working-directory: package

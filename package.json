@@ -22,6 +22,7 @@
     "generate:crds": "node ../crd2pulumi-package-tools/generate.mjs",
     "test": "vitest run",
     "test:dist": "node test/dist-smoke.cjs",
+    "test:kind": "node ../crd2pulumi-package-tools/kubernetes-smoke.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json --noEmit"
   },
   "exports": {
