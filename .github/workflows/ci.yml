@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: package
+      - uses: actions/checkout@v4
+        with:
+          repository: masonbrothers/crd2pulumi-package-tools
+          path: crd2pulumi-package-tools
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.7.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: package/pnpm-lock.yaml
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24.x"
+      - run: go install github.com/pulumi/crd2pulumi@v1.4.0
+      - run: pnpm install --frozen-lockfile
+        working-directory: package
+      - run: pnpm generate:crds
+        working-directory: package
+      - run: git diff --exit-code
+        working-directory: package
+      - run: pnpm typecheck
+        working-directory: package
+      - run: pnpm build
+        working-directory: package
+      - run: pnpm run test --if-present
+        working-directory: package

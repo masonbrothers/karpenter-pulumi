@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "dist",
+    "rootDir": ".",
+    "strict": true,
+    "target": "ES2022",
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": [
+    "aws.ts",
+    "defaults.ts",
+    "index.ts",
+    "karpenter/**/*.ts",
+    "meta/**/*.ts",
+    "provider.ts",
+    "resources.ts",
+    "types/**/*.ts",
+    "utilities.ts"
+  ]
+}

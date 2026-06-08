@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.generated-crds/
+.npm-cache/
+.turbo/
+*.log
+.env
+.env.*
