@@ -39,5 +39,5 @@ jobs:
         working-directory: package
       - run: pnpm build
         working-directory: package
-      - run: pnpm run test --if-present
+      - run: pnpm --if-present test
         working-directory: package
