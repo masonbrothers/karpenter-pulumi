@@ -7,63 +7,69 @@ import * as outputs from "../../types/output";
 import * as utilities from "../../utilities";
 
 /**
- * NodeClaim is the Schema for the NodeClaims API
+ * Patch resources are used to modify existing Kubernetes resources by using
+ * Server-Side Apply updates. The name of the resource must be specified, but all other properties are optional. More than
+ * one patch may be applied to the same resource, and a random FieldManager name will be used for each Patch resource.
+ * Conflicts will result in an error by default, but can be forced using the "pulumi.com/patchForce" annotation. See the
+ * [Server-Side Apply Docs](https://www.pulumi.com/registry/packages/kubernetes/how-to-guides/managing-resources-with-server-side-apply/) for
+ * additional information about using Server-Side Apply to manage Kubernetes resources with Pulumi.
+ * EC2NodeClass is the Schema for the EC2NodeClass API
  */
-export class NodeClaim extends pulumi.CustomResource {
+export class EC2NodeClassPatch extends pulumi.CustomResource {
     /**
-     * Get an existing NodeClaim resource's state with the given name, ID, and optional extra
+     * Get an existing EC2NodeClassPatch resource's state with the given name, ID, and optional extra
      * properties used to qualify the lookup.
      *
      * @param name The _unique_ name of the resulting resource.
      * @param id The _unique_ provider ID of the resource to lookup.
      * @param opts Optional settings to control the behavior of the CustomResource.
      */
-    public static get(name: string, id: pulumi.Input<pulumi.ID>, opts?: pulumi.CustomResourceOptions): NodeClaim {
-        return new NodeClaim(name, undefined as any, { ...opts, id: id });
+    public static get(name: string, id: pulumi.Input<pulumi.ID>, opts?: pulumi.CustomResourceOptions): EC2NodeClassPatch {
+        return new EC2NodeClassPatch(name, undefined as any, { ...opts, id: id });
     }
 
     /** @internal */
-    public static readonly __pulumiType = 'kubernetes:karpenter.sh/v1:NodeClaim';
+    public static readonly __pulumiType = 'kubernetes:karpenter.k8s.aws/v1:EC2NodeClassPatch';
 
     /**
-     * Returns true if the given object is an instance of NodeClaim.  This is designed to work even
+     * Returns true if the given object is an instance of EC2NodeClassPatch.  This is designed to work even
      * when multiple copies of the Pulumi SDK have been loaded into the same process.
      */
-    public static isInstance(obj: any): obj is NodeClaim {
+    public static isInstance(obj: any): obj is EC2NodeClassPatch {
         if (obj === undefined || obj === null) {
             return false;
         }
-        return obj['__pulumiType'] === NodeClaim.__pulumiType;
+        return obj['__pulumiType'] === EC2NodeClassPatch.__pulumiType;
     }
 
     /**
      * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
      */
-    declare public readonly apiVersion: pulumi.Output<"karpenter.sh/v1">;
+    declare public readonly apiVersion: pulumi.Output<"karpenter.k8s.aws/v1">;
     /**
      * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
      */
-    declare public readonly kind: pulumi.Output<"NodeClaim">;
+    declare public readonly kind: pulumi.Output<"EC2NodeClass">;
     /**
      * Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
      */
-    declare public readonly metadata: pulumi.Output<outputs.meta.v1.ObjectMeta>;
-    declare public readonly spec: pulumi.Output<outputs.karpenter.v1.NodeClaimSpec>;
-    declare public /*out*/ readonly status: pulumi.Output<outputs.karpenter.v1.NodeClaimStatus>;
+    declare public readonly metadata: pulumi.Output<outputs.meta.v1.ObjectMetaPatch>;
+    declare public readonly spec: pulumi.Output<outputs.karpenter.v1.EC2NodeClassSpecPatch>;
+    declare public /*out*/ readonly status: pulumi.Output<outputs.karpenter.v1.EC2NodeClassStatusPatch>;
 
     /**
-     * Create a NodeClaim resource with the given unique name, arguments, and options.
+     * Create a EC2NodeClassPatch resource with the given unique name, arguments, and options.
      *
      * @param name The _unique_ name of the resource.
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(name: string, args?: NodeClaimArgs, opts?: pulumi.CustomResourceOptions) {
+    constructor(name: string, args?: EC2NodeClassPatchArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            resourceInputs["apiVersion"] = "karpenter.sh/v1";
-            resourceInputs["kind"] = "NodeClaim";
+            resourceInputs["apiVersion"] = "karpenter.k8s.aws/v1";
+            resourceInputs["kind"] = "EC2NodeClass";
             resourceInputs["metadata"] = args?.metadata;
             resourceInputs["spec"] = args?.spec;
             resourceInputs["status"] = undefined /*out*/;
@@ -75,25 +81,25 @@ export class NodeClaim extends pulumi.CustomResource {
             resourceInputs["status"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        super(NodeClaim.__pulumiType, name, resourceInputs, opts);
+        super(EC2NodeClassPatch.__pulumiType, name, resourceInputs, opts);
     }
 }
 
 /**
- * The set of arguments for constructing a NodeClaim resource.
+ * The set of arguments for constructing a EC2NodeClassPatch resource.
  */
-export interface NodeClaimArgs {
+export interface EC2NodeClassPatchArgs {
     /**
      * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
      */
-    apiVersion?: pulumi.Input<"karpenter.sh/v1" | undefined>;
+    apiVersion?: pulumi.Input<"karpenter.k8s.aws/v1" | undefined>;
     /**
      * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
      */
-    kind?: pulumi.Input<"NodeClaim" | undefined>;
+    kind?: pulumi.Input<"EC2NodeClass" | undefined>;
     /**
      * Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
      */
-    metadata?: pulumi.Input<inputs.meta.v1.ObjectMeta | undefined>;
-    spec?: pulumi.Input<inputs.karpenter.v1.NodeClaimSpec | undefined>;
+    metadata?: pulumi.Input<inputs.meta.v1.ObjectMetaPatch | undefined>;
+    spec?: pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecPatch | undefined>;
 }

@@ -8,22 +8,22 @@ export type KarpenterArchitecture = "amd64" | "arm64";
 export type KarpenterOperatingSystem = "linux" | "windows";
 
 export type NodeClassRef =
-  inputs.karpenter.v1.NodePoolSpecTemplateSpecNodeClassRefArgs;
+  inputs.karpenter.v1.NodePoolSpecTemplateSpecNodeClassRef;
 export type AmiSelectorTerm =
-  inputs.karpenter.v1.EC2NodeClassSpecAmiSelectorTermsArgs;
+  inputs.karpenter.v1.EC2NodeClassSpecAmiSelectorTerms;
 export type BlockDeviceMapping =
-  inputs.karpenter.v1.EC2NodeClassSpecBlockDeviceMappingsArgs;
+  inputs.karpenter.v1.EC2NodeClassSpecBlockDeviceMappings;
 export type SecurityGroupSelectorTerm =
-  inputs.karpenter.v1.EC2NodeClassSpecSecurityGroupSelectorTermsArgs;
+  inputs.karpenter.v1.EC2NodeClassSpecSecurityGroupSelectorTerms;
 export type SubnetSelectorTerm =
-  inputs.karpenter.v1.EC2NodeClassSpecSubnetSelectorTermsArgs;
-export type Ec2NodeClassSpec = inputs.karpenter.v1.EC2NodeClassSpecArgs;
+  inputs.karpenter.v1.EC2NodeClassSpecSubnetSelectorTerms;
+export type Ec2NodeClassSpec = inputs.karpenter.v1.EC2NodeClassSpec;
 export type Requirement =
-  inputs.karpenter.v1.NodePoolSpecTemplateSpecRequirementsArgs;
-export type Taint = inputs.karpenter.v1.NodePoolSpecTemplateSpecTaintsArgs;
+  inputs.karpenter.v1.NodePoolSpecTemplateSpecRequirements;
+export type Taint = inputs.karpenter.v1.NodePoolSpecTemplateSpecTaints;
 export type StartupTaint =
-  inputs.karpenter.v1.NodePoolSpecTemplateSpecStartupTaintsArgs;
-export type NodePoolSpec = inputs.karpenter.v1.NodePoolSpecArgs;
+  inputs.karpenter.v1.NodePoolSpecTemplateSpecStartupTaints;
+export type NodePoolSpec = inputs.karpenter.v1.NodePoolSpec;
 
 export interface CreateEc2NodeClassManifestArgs {
   readonly name: string;

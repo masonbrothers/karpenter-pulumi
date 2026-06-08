@@ -5,17 +5,38 @@ import * as pulumi from "@pulumi/pulumi";
 import * as inputs from "../types/input";
 import * as outputs from "../types/output";
 
-import * as utilities from "../utilities";
-
-import {ObjectMeta} from "../meta/v1";
+export namespace autoscaling {
+    export namespace v1 {
+    }
+}
 
 export namespace karpenter {
     export namespace v1 {
         /**
+         * EC2NodeClass is the Schema for the EC2NodeClass API
+         */
+        export interface EC2NodeClass {
+            /**
+             * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+             */
+            apiVersion?: pulumi.Input<"karpenter.k8s.aws/v1" | undefined>;
+            /**
+             * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+             */
+            kind?: pulumi.Input<"EC2NodeClass" | undefined>;
+            /**
+             * Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+             */
+            metadata?: pulumi.Input<inputs.meta.v1.ObjectMeta | undefined>;
+            spec?: pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpec | undefined>;
+            status?: pulumi.Input<inputs.karpenter.v1.EC2NodeClassStatus | undefined>;
+        }
+
+        /**
          * EC2NodeClassSpec is the top level specification for the AWS Karpenter Provider.
          * This will contain configuration necessary to launch instances in AWS.
          */
-        export interface EC2NodeClassSpecArgs {
+        export interface EC2NodeClassSpec {
             /**
              * AMIFamily dictates the UserData format and default BlockDeviceMappings used when generating launch templates.
              * This field is optional when using an alias amiSelectorTerm, and the value will be inferred from the alias'
@@ -24,118 +45,85 @@ export namespace karpenter {
              * NOTE: We ignore the AMIFamily for hashing here because we hash the AMIFamily dynamically by using the alias using
              * the AMIFamily() helper function
              */
-            amiFamily?: pulumi.Input<string>;
+            amiFamily?: pulumi.Input<string | undefined>;
             /**
              * AMISelectorTerms is a list of or ami selector terms. The terms are ORed.
              */
-            amiSelectorTerms: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecAmiSelectorTermsArgs>[]>;
+            amiSelectorTerms?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecAmiSelectorTerms>[] | undefined>;
             /**
              * AssociatePublicIPAddress controls if public IP addresses are assigned to instances that are launched with the nodeclass.
              */
-            associatePublicIPAddress?: pulumi.Input<boolean>;
+            associatePublicIPAddress?: pulumi.Input<boolean | undefined>;
             /**
              * BlockDeviceMappings to be applied to provisioned nodes.
              */
-            blockDeviceMappings?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecBlockDeviceMappingsArgs>[]>;
+            blockDeviceMappings?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecBlockDeviceMappings>[] | undefined>;
             /**
              * CapacityReservationSelectorTerms is a list of capacity reservation selector terms. Each term is ORed together to
              * determine the set of eligible capacity reservations.
              */
-            capacityReservationSelectorTerms?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecCapacityReservationSelectorTermsArgs>[]>;
+            capacityReservationSelectorTerms?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecCapacityReservationSelectorTerms>[] | undefined>;
             /**
              * Context is a Reserved field in EC2 APIs
              * https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_CreateFleet.html
              */
-            context?: pulumi.Input<string>;
+            context?: pulumi.Input<string | undefined>;
             /**
              * DetailedMonitoring controls if detailed monitoring is enabled for instances that are launched
              */
-            detailedMonitoring?: pulumi.Input<boolean>;
+            detailedMonitoring?: pulumi.Input<boolean | undefined>;
             /**
              * InstanceProfile is the AWS entity that instances use.
              * This field is mutually exclusive from role.
              * The instance profile should already have a role assigned to it that Karpenter
              *  has PassRole permission on for instance launch using this instanceProfile to succeed.
              */
-            instanceProfile?: pulumi.Input<string>;
+            instanceProfile?: pulumi.Input<string | undefined>;
             /**
              * InstanceStorePolicy specifies how to handle instance-store disks.
              */
-            instanceStorePolicy?: pulumi.Input<string>;
+            instanceStorePolicy?: pulumi.Input<string | undefined>;
             /**
              * IPPrefixCount sets the number of IPv4 prefixes to be automatically assigned to the network interface.
              */
-            ipPrefixCount?: pulumi.Input<number>;
-            /**
-             * Kubelet defines args to be used when configuring kubelet on provisioned nodes.
-             * They are a subset of the upstream types, recognizing not all options may be supported.
-             * Wherever possible, the types and names should reflect the upstream kubelet types.
-             */
-            kubelet?: pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecKubeletArgs>;
-            /**
-             * MetadataOptions for the generated launch template of provisioned nodes.
-             *
-             * This specifies the exposure of the Instance Metadata Service to
-             * provisioned EC2 nodes. For more information,
-             * see Instance Metadata and User Data
-             * (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html)
-             * in the Amazon Elastic Compute Cloud User Guide.
-             *
-             * Refer to recommended, security best practices
-             * (https://aws.github.io/aws-eks-best-practices/security/docs/iam/#restrict-access-to-the-instance-profile-assigned-to-the-worker-node)
-             * for limiting exposure of Instance Metadata and User Data to pods.
-             * If omitted, defaults to httpEndpoint enabled, with httpProtocolIPv6
-             * disabled, with httpPutResponseLimit of 1, and with httpTokens
-             * required.
-             */
-            metadataOptions?: pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecMetadataOptionsArgs>;
+            ipPrefixCount?: pulumi.Input<number | undefined>;
+            kubelet?: pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecKubelet | undefined>;
+            metadataOptions?: pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecMetadataOptions | undefined>;
             /**
              * NetworkInterfaces specifies the network interface configurations to be attached to provisioned instances.
              */
-            networkInterfaces?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecNetworkInterfacesArgs>[]>;
-            /**
-             * PlacementGroupSelector defines the name or the id of the placement to resolve with the nodeclass.
-             */
-            placementGroupSelector?: pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecPlacementGroupSelectorArgs>;
+            networkInterfaces?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecNetworkInterfaces>[] | undefined>;
+            placementGroupSelector?: pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecPlacementGroupSelector | undefined>;
             /**
              * Role is the AWS identity that nodes use.
              * This field is mutually exclusive from instanceProfile.
              */
-            role?: pulumi.Input<string>;
+            role?: pulumi.Input<string | undefined>;
             /**
              * SecurityGroupSelectorTerms is a list of security group selector terms. The terms are ORed.
              */
-            securityGroupSelectorTerms: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecSecurityGroupSelectorTermsArgs>[]>;
+            securityGroupSelectorTerms?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecSecurityGroupSelectorTerms>[] | undefined>;
             /**
              * SubnetSelectorTerms is a list of subnet selector terms. The terms are ORed.
              */
-            subnetSelectorTerms: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecSubnetSelectorTermsArgs>[]>;
+            subnetSelectorTerms?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecSubnetSelectorTerms>[] | undefined>;
             /**
              * Tags to be applied on ec2 resources like instances and launch templates.
              */
-            tags?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
+            tags?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
             /**
              * UserData to be applied to the provisioned nodes.
              * It must be in the appropriate format based on the AMIFamily in use. Karpenter will merge certain fields into
              * this UserData to ensure nodes are being provisioned with the correct configuration.
              */
-            userData?: pulumi.Input<string>;
-        }
-        /**
-         * ec2nodeClassSpecArgsProvideDefaults sets the appropriate defaults for EC2NodeClassSpecArgs
-         */
-        export function ec2nodeClassSpecArgsProvideDefaults(val: EC2NodeClassSpecArgs): EC2NodeClassSpecArgs {
-            return {
-                ...val,
-                metadataOptions: (val.metadataOptions ? pulumi.output(val.metadataOptions).apply(inputs.karpenter.v1.ec2nodeClassSpecMetadataOptionsArgsProvideDefaults) : undefined),
-            };
+            userData?: pulumi.Input<string | undefined>;
         }
 
         /**
          * AMISelectorTerm defines selection logic for an ami used by Karpenter to launch nodes.
          * If multiple fields are used for selection, the requirements are ANDed.
          */
-        export interface EC2NodeClassSpecAmiSelectorTermsArgs {
+        export interface EC2NodeClassSpecAmiSelectorTerms {
             /**
              * Alias specifies which EKS optimized AMI to select.
              * Each alias consists of a family and an AMI version, specified as "family@version".
@@ -144,62 +132,98 @@ export namespace karpenter {
              * The version can also be set to "latest" for any family. Setting the version to latest will result in drift when a new AMI is released. This is **not** recommended for production environments.
              * Note: The Windows families do **not** support version pinning, and only latest may be used.
              */
-            alias?: pulumi.Input<string>;
+            alias?: pulumi.Input<string | undefined>;
             /**
              * ID is the ami id in EC2
              */
-            id?: pulumi.Input<string>;
+            id?: pulumi.Input<string | undefined>;
             /**
              * Name is the ami name in EC2.
              * This value is the name field, which is different from the name tag.
              */
-            name?: pulumi.Input<string>;
+            name?: pulumi.Input<string | undefined>;
             /**
              * Owner is the owner for the ami.
              * You can specify a combination of AWS account IDs, "self", "amazon", and "aws-marketplace"
              */
-            owner?: pulumi.Input<string>;
+            owner?: pulumi.Input<string | undefined>;
             /**
              * SSMParameter is the name (or ARN) of the SSM parameter containing the Image ID.
              */
-            ssmParameter?: pulumi.Input<string>;
+            ssmParameter?: pulumi.Input<string | undefined>;
             /**
              * Tags is a map of key/value tags used to select amis.
              * Specifying '*' for a value selects all values for a given tag key.
              */
-            tags?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
+            tags?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
         }
 
-        export interface EC2NodeClassSpecBlockDeviceMappingsArgs {
+        /**
+         * AMISelectorTerm defines selection logic for an ami used by Karpenter to launch nodes.
+         * If multiple fields are used for selection, the requirements are ANDed.
+         */
+        export interface EC2NodeClassSpecAmiSelectorTermsPatch {
+            /**
+             * Alias specifies which EKS optimized AMI to select.
+             * Each alias consists of a family and an AMI version, specified as "family@version".
+             * Valid families include: al2, al2023, bottlerocket, windows2019, windows2022, windows2025.
+             * The version can either be pinned to a specific AMI release, with that AMIs version format (ex: "al2023@v20240625" or "bottlerocket@v1.10.0").
+             * The version can also be set to "latest" for any family. Setting the version to latest will result in drift when a new AMI is released. This is **not** recommended for production environments.
+             * Note: The Windows families do **not** support version pinning, and only latest may be used.
+             */
+            alias?: pulumi.Input<string | undefined>;
+            /**
+             * ID is the ami id in EC2
+             */
+            id?: pulumi.Input<string | undefined>;
+            /**
+             * Name is the ami name in EC2.
+             * This value is the name field, which is different from the name tag.
+             */
+            name?: pulumi.Input<string | undefined>;
+            /**
+             * Owner is the owner for the ami.
+             * You can specify a combination of AWS account IDs, "self", "amazon", and "aws-marketplace"
+             */
+            owner?: pulumi.Input<string | undefined>;
+            /**
+             * SSMParameter is the name (or ARN) of the SSM parameter containing the Image ID.
+             */
+            ssmParameter?: pulumi.Input<string | undefined>;
+            /**
+             * Tags is a map of key/value tags used to select amis.
+             * Specifying '*' for a value selects all values for a given tag key.
+             */
+            tags?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
+        }
+
+        export interface EC2NodeClassSpecBlockDeviceMappings {
             /**
              * The device name (for example, /dev/sdh or xvdh).
              */
-            deviceName?: pulumi.Input<string>;
-            /**
-             * EBS contains parameters used to automatically set up EBS volumes when an instance is launched.
-             */
-            ebs?: pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecBlockDeviceMappingsEbsArgs>;
+            deviceName?: pulumi.Input<string | undefined>;
+            ebs?: pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecBlockDeviceMappingsEbs | undefined>;
             /**
              * RootVolume is a flag indicating if this device is mounted as kubelet root dir. You can
              * configure at most one root volume in BlockDeviceMappings.
              */
-            rootVolume?: pulumi.Input<boolean>;
+            rootVolume?: pulumi.Input<boolean | undefined>;
         }
 
         /**
          * EBS contains parameters used to automatically set up EBS volumes when an instance is launched.
          */
-        export interface EC2NodeClassSpecBlockDeviceMappingsEbsArgs {
+        export interface EC2NodeClassSpecBlockDeviceMappingsEbs {
             /**
              * DeleteOnTermination indicates whether the EBS volume is deleted on instance termination.
              */
-            deleteOnTermination?: pulumi.Input<boolean>;
+            deleteOnTermination?: pulumi.Input<boolean | undefined>;
             /**
              * Encrypted indicates whether the EBS volume is encrypted. Encrypted volumes can only
              * be attached to instances that support Amazon EBS encryption. If you are creating
              * a volume from a snapshot, you can't specify an encryption value.
              */
-            encrypted?: pulumi.Input<boolean>;
+            encrypted?: pulumi.Input<boolean | undefined>;
             /**
              * IOPS is the number of I/O operations per second (IOPS). For gp3, io1, and io2 volumes,
              * this represents the number of IOPS that are provisioned for the volume. For
@@ -221,20 +245,20 @@ export namespace karpenter {
              * This parameter is supported for io1, io2, and gp3 volumes only. This parameter
              * is not supported for gp2, st1, sc1, or standard volumes.
              */
-            iops?: pulumi.Input<number>;
+            iops?: pulumi.Input<number | undefined>;
             /**
              * Identifier (key ID, key alias, key ARN, or alias ARN) of the customer managed KMS key to use for EBS encryption.
              */
-            kmsKeyID?: pulumi.Input<string>;
+            kmsKeyID?: pulumi.Input<string | undefined>;
             /**
              * SnapshotID is the ID of an EBS snapshot
              */
-            snapshotID?: pulumi.Input<string>;
+            snapshotID?: pulumi.Input<string | undefined>;
             /**
              * Throughput to provision for a gp3 volume, with a maximum of 1,000 MiB/s.
              * Valid Range: Minimum value of 125. Maximum value of 1000.
              */
-            throughput?: pulumi.Input<number>;
+            throughput?: pulumi.Input<number | undefined>;
             /**
              * VolumeInitializationRate specifies the Amazon EBS Provisioned Rate for Volume Initialization,
              * in MiB/s, at which to download the snapshot blocks from Amazon S3 to the volume. This is also known as volume
@@ -242,7 +266,7 @@ export namespace karpenter {
              * predictable and consistent rate after creation. Only allowed if SnapshotID is set.
              * Valid Range: Minimum value of 100. Maximum value of 300.
              */
-            volumeInitializationRate?: pulumi.Input<number>;
+            volumeInitializationRate?: pulumi.Input<number | undefined>;
             /**
              * VolumeSize in `Gi`, `G`, `Ti`, or `T`. You must specify either a snapshot ID or
              * a volume size. The following are the supported volumes sizes for each volume
@@ -256,33 +280,145 @@ export namespace karpenter {
              *
              *    * standard: 1-1,024
              */
-            volumeSize?: pulumi.Input<string>;
+            volumeSize?: pulumi.Input<string | undefined>;
             /**
              * VolumeType of the block device.
              * For more information, see Amazon EBS volume types (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSVolumeTypes.html)
              * in the Amazon Elastic Compute Cloud User Guide.
              */
-            volumeType?: pulumi.Input<string>;
+            volumeType?: pulumi.Input<string | undefined>;
         }
 
-        export interface EC2NodeClassSpecCapacityReservationSelectorTermsArgs {
+        /**
+         * EBS contains parameters used to automatically set up EBS volumes when an instance is launched.
+         */
+        export interface EC2NodeClassSpecBlockDeviceMappingsEbsPatch {
+            /**
+             * DeleteOnTermination indicates whether the EBS volume is deleted on instance termination.
+             */
+            deleteOnTermination?: pulumi.Input<boolean | undefined>;
+            /**
+             * Encrypted indicates whether the EBS volume is encrypted. Encrypted volumes can only
+             * be attached to instances that support Amazon EBS encryption. If you are creating
+             * a volume from a snapshot, you can't specify an encryption value.
+             */
+            encrypted?: pulumi.Input<boolean | undefined>;
+            /**
+             * IOPS is the number of I/O operations per second (IOPS). For gp3, io1, and io2 volumes,
+             * this represents the number of IOPS that are provisioned for the volume. For
+             * gp2 volumes, this represents the baseline performance of the volume and the
+             * rate at which the volume accumulates I/O credits for bursting.
+             *
+             * The following are the supported values for each volume type:
+             *
+             *    * gp3: 3,000-16,000 IOPS
+             *
+             *    * io1: 100-64,000 IOPS
+             *
+             *    * io2: 100-64,000 IOPS
+             *
+             * For io1 and io2 volumes, we guarantee 64,000 IOPS only for Instances built
+             * on the Nitro System (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-types.html#ec2-nitro-instances).
+             * Other instance families guarantee performance up to 32,000 IOPS.
+             *
+             * This parameter is supported for io1, io2, and gp3 volumes only. This parameter
+             * is not supported for gp2, st1, sc1, or standard volumes.
+             */
+            iops?: pulumi.Input<number | undefined>;
+            /**
+             * Identifier (key ID, key alias, key ARN, or alias ARN) of the customer managed KMS key to use for EBS encryption.
+             */
+            kmsKeyID?: pulumi.Input<string | undefined>;
+            /**
+             * SnapshotID is the ID of an EBS snapshot
+             */
+            snapshotID?: pulumi.Input<string | undefined>;
+            /**
+             * Throughput to provision for a gp3 volume, with a maximum of 1,000 MiB/s.
+             * Valid Range: Minimum value of 125. Maximum value of 1000.
+             */
+            throughput?: pulumi.Input<number | undefined>;
+            /**
+             * VolumeInitializationRate specifies the Amazon EBS Provisioned Rate for Volume Initialization,
+             * in MiB/s, at which to download the snapshot blocks from Amazon S3 to the volume. This is also known as volume
+             * initialization. Specifying a volume initialization rate ensures that the volume is initialized at a
+             * predictable and consistent rate after creation. Only allowed if SnapshotID is set.
+             * Valid Range: Minimum value of 100. Maximum value of 300.
+             */
+            volumeInitializationRate?: pulumi.Input<number | undefined>;
+            /**
+             * VolumeSize in `Gi`, `G`, `Ti`, or `T`. You must specify either a snapshot ID or
+             * a volume size. The following are the supported volumes sizes for each volume
+             * type:
+             *
+             *    * gp2 and gp3: 1-16,384
+             *
+             *    * io1 and io2: 4-16,384
+             *
+             *    * st1 and sc1: 125-16,384
+             *
+             *    * standard: 1-1,024
+             */
+            volumeSize?: pulumi.Input<string | undefined>;
+            /**
+             * VolumeType of the block device.
+             * For more information, see Amazon EBS volume types (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSVolumeTypes.html)
+             * in the Amazon Elastic Compute Cloud User Guide.
+             */
+            volumeType?: pulumi.Input<string | undefined>;
+        }
+
+        export interface EC2NodeClassSpecBlockDeviceMappingsPatch {
+            /**
+             * The device name (for example, /dev/sdh or xvdh).
+             */
+            deviceName?: pulumi.Input<string | undefined>;
+            ebs?: pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecBlockDeviceMappingsEbsPatch | undefined>;
+            /**
+             * RootVolume is a flag indicating if this device is mounted as kubelet root dir. You can
+             * configure at most one root volume in BlockDeviceMappings.
+             */
+            rootVolume?: pulumi.Input<boolean | undefined>;
+        }
+
+        export interface EC2NodeClassSpecCapacityReservationSelectorTerms {
             /**
              * ID is the capacity reservation id in EC2
              */
-            id?: pulumi.Input<string>;
+            id?: pulumi.Input<string | undefined>;
             /**
              * InstanceMatchCriteria specifies how instances are matched to capacity reservations.
              */
-            instanceMatchCriteria?: pulumi.Input<string>;
+            instanceMatchCriteria?: pulumi.Input<string | undefined>;
             /**
              * Owner is the owner id for the ami.
              */
-            ownerID?: pulumi.Input<string>;
+            ownerID?: pulumi.Input<string | undefined>;
             /**
              * Tags is a map of key/value tags used to select capacity reservations.
              * Specifying '*' for a value selects all values for a given tag key.
              */
-            tags?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
+            tags?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
+        }
+
+        export interface EC2NodeClassSpecCapacityReservationSelectorTermsPatch {
+            /**
+             * ID is the capacity reservation id in EC2
+             */
+            id?: pulumi.Input<string | undefined>;
+            /**
+             * InstanceMatchCriteria specifies how instances are matched to capacity reservations.
+             */
+            instanceMatchCriteria?: pulumi.Input<string | undefined>;
+            /**
+             * Owner is the owner id for the ami.
+             */
+            ownerID?: pulumi.Input<string | undefined>;
+            /**
+             * Tags is a map of key/value tags used to select capacity reservations.
+             * Specifying '*' for a value selects all values for a given tag key.
+             */
+            tags?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
         }
 
         /**
@@ -290,40 +426,40 @@ export namespace karpenter {
          * They are a subset of the upstream types, recognizing not all options may be supported.
          * Wherever possible, the types and names should reflect the upstream kubelet types.
          */
-        export interface EC2NodeClassSpecKubeletArgs {
+        export interface EC2NodeClassSpecKubelet {
             /**
              * clusterDNS is a list of IP addresses for the cluster DNS server.
              * Note that not all providers may use all addresses.
              */
-            clusterDNS?: pulumi.Input<pulumi.Input<string>[]>;
+            clusterDNS?: pulumi.Input<pulumi.Input<string>[] | undefined>;
             /**
              * CPUCFSQuota enables CPU CFS quota enforcement for containers that specify CPU limits.
              */
-            cpuCFSQuota?: pulumi.Input<boolean>;
+            cpuCFSQuota?: pulumi.Input<boolean | undefined>;
             /**
              * EvictionHard is the map of signal names to quantities that define hard eviction thresholds
              */
-            evictionHard?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
+            evictionHard?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
             /**
              * EvictionMaxPodGracePeriod is the maximum allowed grace period (in seconds) to use when terminating pods in
              * response to soft eviction thresholds being met.
              */
-            evictionMaxPodGracePeriod?: pulumi.Input<number>;
+            evictionMaxPodGracePeriod?: pulumi.Input<number | undefined>;
             /**
              * EvictionSoft is the map of signal names to quantities that define soft eviction thresholds
              */
-            evictionSoft?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
+            evictionSoft?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
             /**
              * EvictionSoftGracePeriod is the map of signal names to quantities that define grace periods for each eviction signal
              */
-            evictionSoftGracePeriod?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
+            evictionSoftGracePeriod?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
             /**
              * ImageGCHighThresholdPercent is the percent of disk usage after which image
              * garbage collection is always run. The percent is calculated by dividing this
              * field value by 100, so this field must be between 0 and 100, inclusive.
              * When specified, the value must be greater than ImageGCLowThresholdPercent.
              */
-            imageGCHighThresholdPercent?: pulumi.Input<number>;
+            imageGCHighThresholdPercent?: pulumi.Input<number | undefined>;
             /**
              * ImageGCLowThresholdPercent is the percent of disk usage before which image
              * garbage collection is never run. Lowest disk usage to garbage collect to.
@@ -331,26 +467,94 @@ export namespace karpenter {
              * so the field value must be between 0 and 100, inclusive.
              * When specified, the value must be less than imageGCHighThresholdPercent
              */
-            imageGCLowThresholdPercent?: pulumi.Input<number>;
+            imageGCLowThresholdPercent?: pulumi.Input<number | undefined>;
             /**
              * KubeReserved contains resources reserved for Kubernetes system components.
              */
-            kubeReserved?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
+            kubeReserved?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
             /**
              * MaxPods is an override for the maximum number of pods that can run on
              * a worker node instance.
              */
-            maxPods?: pulumi.Input<number>;
+            maxPods?: pulumi.Input<number | undefined>;
             /**
              * PodsPerCore is an override for the number of pods that can run on a worker node
              * instance based on the number of cpu cores. This value cannot exceed MaxPods, so, if
              * MaxPods is a lower value, that value will be used.
              */
-            podsPerCore?: pulumi.Input<number>;
+            podsPerCore?: pulumi.Input<number | undefined>;
             /**
              * SystemReserved contains resources reserved for OS system daemons and kernel memory.
              */
-            systemReserved?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
+            systemReserved?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
+        }
+
+        /**
+         * Kubelet defines args to be used when configuring kubelet on provisioned nodes.
+         * They are a subset of the upstream types, recognizing not all options may be supported.
+         * Wherever possible, the types and names should reflect the upstream kubelet types.
+         */
+        export interface EC2NodeClassSpecKubeletPatch {
+            /**
+             * clusterDNS is a list of IP addresses for the cluster DNS server.
+             * Note that not all providers may use all addresses.
+             */
+            clusterDNS?: pulumi.Input<pulumi.Input<string>[] | undefined>;
+            /**
+             * CPUCFSQuota enables CPU CFS quota enforcement for containers that specify CPU limits.
+             */
+            cpuCFSQuota?: pulumi.Input<boolean | undefined>;
+            /**
+             * EvictionHard is the map of signal names to quantities that define hard eviction thresholds
+             */
+            evictionHard?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
+            /**
+             * EvictionMaxPodGracePeriod is the maximum allowed grace period (in seconds) to use when terminating pods in
+             * response to soft eviction thresholds being met.
+             */
+            evictionMaxPodGracePeriod?: pulumi.Input<number | undefined>;
+            /**
+             * EvictionSoft is the map of signal names to quantities that define soft eviction thresholds
+             */
+            evictionSoft?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
+            /**
+             * EvictionSoftGracePeriod is the map of signal names to quantities that define grace periods for each eviction signal
+             */
+            evictionSoftGracePeriod?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
+            /**
+             * ImageGCHighThresholdPercent is the percent of disk usage after which image
+             * garbage collection is always run. The percent is calculated by dividing this
+             * field value by 100, so this field must be between 0 and 100, inclusive.
+             * When specified, the value must be greater than ImageGCLowThresholdPercent.
+             */
+            imageGCHighThresholdPercent?: pulumi.Input<number | undefined>;
+            /**
+             * ImageGCLowThresholdPercent is the percent of disk usage before which image
+             * garbage collection is never run. Lowest disk usage to garbage collect to.
+             * The percent is calculated by dividing this field value by 100,
+             * so the field value must be between 0 and 100, inclusive.
+             * When specified, the value must be less than imageGCHighThresholdPercent
+             */
+            imageGCLowThresholdPercent?: pulumi.Input<number | undefined>;
+            /**
+             * KubeReserved contains resources reserved for Kubernetes system components.
+             */
+            kubeReserved?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
+            /**
+             * MaxPods is an override for the maximum number of pods that can run on
+             * a worker node instance.
+             */
+            maxPods?: pulumi.Input<number | undefined>;
+            /**
+             * PodsPerCore is an override for the number of pods that can run on a worker node
+             * instance based on the number of cpu cores. This value cannot exceed MaxPods, so, if
+             * MaxPods is a lower value, that value will be used.
+             */
+            podsPerCore?: pulumi.Input<number | undefined>;
+            /**
+             * SystemReserved contains resources reserved for OS system daemons and kernel memory.
+             */
+            systemReserved?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
         }
 
         /**
@@ -369,7 +573,7 @@ export namespace karpenter {
          * disabled, with httpPutResponseLimit of 1, and with httpTokens
          * required.
          */
-        export interface EC2NodeClassSpecMetadataOptionsArgs {
+        export interface EC2NodeClassSpecMetadataOptions {
             /**
              * HTTPEndpoint enables or disables the HTTP metadata endpoint on provisioned
              * nodes. If metadata options is non-nil, but this parameter is not specified,
@@ -378,13 +582,13 @@ export namespace karpenter {
              * If you specify a value of "disabled", instance metadata will not be accessible
              * on the node.
              */
-            httpEndpoint?: pulumi.Input<string>;
+            httpEndpoint?: pulumi.Input<string | undefined>;
             /**
              * HTTPProtocolIPv6 enables or disables the IPv6 endpoint for the instance metadata
              * service on provisioned nodes. If metadata options is non-nil, but this parameter
              * is not specified, the default state is "disabled".
              */
-            httpProtocolIPv6?: pulumi.Input<string>;
+            httpProtocolIPv6?: pulumi.Input<string | undefined>;
             /**
              * HTTPPutResponseHopLimit is the desired HTTP PUT response hop limit for
              * instance metadata requests. The larger the number, the further instance
@@ -392,7 +596,7 @@ export namespace karpenter {
              * If metadata options is non-nil, but this parameter is not specified, the
              * default value is 1.
              */
-            httpPutResponseHopLimit?: pulumi.Input<number>;
+            httpPutResponseHopLimit?: pulumi.Input<number | undefined>;
             /**
              * HTTPTokens determines the state of token usage for instance metadata
              * requests. If metadata options is non-nil, but this parameter is not
@@ -409,161 +613,365 @@ export namespace karpenter {
              * role credentials always returns the version 2.0 credentials; the version
              * 1.0 credentials are not available.
              */
-            httpTokens?: pulumi.Input<string>;
+            httpTokens?: pulumi.Input<string | undefined>;
         }
+
         /**
-         * ec2nodeClassSpecMetadataOptionsArgsProvideDefaults sets the appropriate defaults for EC2NodeClassSpecMetadataOptionsArgs
+         * MetadataOptions for the generated launch template of provisioned nodes.
+         *
+         * This specifies the exposure of the Instance Metadata Service to
+         * provisioned EC2 nodes. For more information,
+         * see Instance Metadata and User Data
+         * (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html)
+         * in the Amazon Elastic Compute Cloud User Guide.
+         *
+         * Refer to recommended, security best practices
+         * (https://aws.github.io/aws-eks-best-practices/security/docs/iam/#restrict-access-to-the-instance-profile-assigned-to-the-worker-node)
+         * for limiting exposure of Instance Metadata and User Data to pods.
+         * If omitted, defaults to httpEndpoint enabled, with httpProtocolIPv6
+         * disabled, with httpPutResponseLimit of 1, and with httpTokens
+         * required.
          */
-        export function ec2nodeClassSpecMetadataOptionsArgsProvideDefaults(val: EC2NodeClassSpecMetadataOptionsArgs): EC2NodeClassSpecMetadataOptionsArgs {
-            return {
-                ...val,
-                httpEndpoint: (val.httpEndpoint) ?? "enabled",
-                httpProtocolIPv6: (val.httpProtocolIPv6) ?? "disabled",
-                httpPutResponseHopLimit: (val.httpPutResponseHopLimit) ?? 1,
-                httpTokens: (val.httpTokens) ?? "required",
-            };
+        export interface EC2NodeClassSpecMetadataOptionsPatch {
+            /**
+             * HTTPEndpoint enables or disables the HTTP metadata endpoint on provisioned
+             * nodes. If metadata options is non-nil, but this parameter is not specified,
+             * the default state is "enabled".
+             *
+             * If you specify a value of "disabled", instance metadata will not be accessible
+             * on the node.
+             */
+            httpEndpoint?: pulumi.Input<string | undefined>;
+            /**
+             * HTTPProtocolIPv6 enables or disables the IPv6 endpoint for the instance metadata
+             * service on provisioned nodes. If metadata options is non-nil, but this parameter
+             * is not specified, the default state is "disabled".
+             */
+            httpProtocolIPv6?: pulumi.Input<string | undefined>;
+            /**
+             * HTTPPutResponseHopLimit is the desired HTTP PUT response hop limit for
+             * instance metadata requests. The larger the number, the further instance
+             * metadata requests can travel. Possible values are integers from 1 to 64.
+             * If metadata options is non-nil, but this parameter is not specified, the
+             * default value is 1.
+             */
+            httpPutResponseHopLimit?: pulumi.Input<number | undefined>;
+            /**
+             * HTTPTokens determines the state of token usage for instance metadata
+             * requests. If metadata options is non-nil, but this parameter is not
+             * specified, the default state is "required".
+             *
+             * If the state is optional, one can choose to retrieve instance metadata with
+             * or without a signed token header on the request. If one retrieves the IAM
+             * role credentials without a token, the version 1.0 role credentials are
+             * returned. If one retrieves the IAM role credentials using a valid signed
+             * token, the version 2.0 role credentials are returned.
+             *
+             * If the state is "required", one must send a signed token header with any
+             * instance metadata retrieval requests. In this state, retrieving the IAM
+             * role credentials always returns the version 2.0 credentials; the version
+             * 1.0 credentials are not available.
+             */
+            httpTokens?: pulumi.Input<string | undefined>;
         }
 
         /**
          * NetworkInterface specifies the configuration for a network interface to be attached
          * to provisioned instances.
          */
-        export interface EC2NodeClassSpecNetworkInterfacesArgs {
+        export interface EC2NodeClassSpecNetworkInterfaces {
             /**
              * DeviceIndex is the device index for the network interface attachment.
              */
-            deviceIndex: pulumi.Input<number>;
+            deviceIndex?: pulumi.Input<number | undefined>;
             /**
              * InterfaceType is the type of network interface. Valid values are "interface" and "efa-only".
              */
-            interfaceType: pulumi.Input<string>;
+            interfaceType?: pulumi.Input<string | undefined>;
             /**
              * NetworkCardIndex is the index of the network card to attach the interface to.
              */
-            networkCardIndex: pulumi.Input<number>;
+            networkCardIndex?: pulumi.Input<number | undefined>;
+        }
+
+        /**
+         * NetworkInterface specifies the configuration for a network interface to be attached
+         * to provisioned instances.
+         */
+        export interface EC2NodeClassSpecNetworkInterfacesPatch {
+            /**
+             * DeviceIndex is the device index for the network interface attachment.
+             */
+            deviceIndex?: pulumi.Input<number | undefined>;
+            /**
+             * InterfaceType is the type of network interface. Valid values are "interface" and "efa-only".
+             */
+            interfaceType?: pulumi.Input<string | undefined>;
+            /**
+             * NetworkCardIndex is the index of the network card to attach the interface to.
+             */
+            networkCardIndex?: pulumi.Input<number | undefined>;
+        }
+
+        /**
+         * EC2NodeClassSpec is the top level specification for the AWS Karpenter Provider.
+         * This will contain configuration necessary to launch instances in AWS.
+         */
+        export interface EC2NodeClassSpecPatch {
+            /**
+             * AMIFamily dictates the UserData format and default BlockDeviceMappings used when generating launch templates.
+             * This field is optional when using an alias amiSelectorTerm, and the value will be inferred from the alias'
+             * family. When an alias is specified, this field may only be set to its corresponding family or 'Custom'. If no
+             * alias is specified, this field is required.
+             * NOTE: We ignore the AMIFamily for hashing here because we hash the AMIFamily dynamically by using the alias using
+             * the AMIFamily() helper function
+             */
+            amiFamily?: pulumi.Input<string | undefined>;
+            /**
+             * AMISelectorTerms is a list of or ami selector terms. The terms are ORed.
+             */
+            amiSelectorTerms?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecAmiSelectorTermsPatch>[] | undefined>;
+            /**
+             * AssociatePublicIPAddress controls if public IP addresses are assigned to instances that are launched with the nodeclass.
+             */
+            associatePublicIPAddress?: pulumi.Input<boolean | undefined>;
+            /**
+             * BlockDeviceMappings to be applied to provisioned nodes.
+             */
+            blockDeviceMappings?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecBlockDeviceMappingsPatch>[] | undefined>;
+            /**
+             * CapacityReservationSelectorTerms is a list of capacity reservation selector terms. Each term is ORed together to
+             * determine the set of eligible capacity reservations.
+             */
+            capacityReservationSelectorTerms?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecCapacityReservationSelectorTermsPatch>[] | undefined>;
+            /**
+             * Context is a Reserved field in EC2 APIs
+             * https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_CreateFleet.html
+             */
+            context?: pulumi.Input<string | undefined>;
+            /**
+             * DetailedMonitoring controls if detailed monitoring is enabled for instances that are launched
+             */
+            detailedMonitoring?: pulumi.Input<boolean | undefined>;
+            /**
+             * InstanceProfile is the AWS entity that instances use.
+             * This field is mutually exclusive from role.
+             * The instance profile should already have a role assigned to it that Karpenter
+             *  has PassRole permission on for instance launch using this instanceProfile to succeed.
+             */
+            instanceProfile?: pulumi.Input<string | undefined>;
+            /**
+             * InstanceStorePolicy specifies how to handle instance-store disks.
+             */
+            instanceStorePolicy?: pulumi.Input<string | undefined>;
+            /**
+             * IPPrefixCount sets the number of IPv4 prefixes to be automatically assigned to the network interface.
+             */
+            ipPrefixCount?: pulumi.Input<number | undefined>;
+            kubelet?: pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecKubeletPatch | undefined>;
+            metadataOptions?: pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecMetadataOptionsPatch | undefined>;
+            /**
+             * NetworkInterfaces specifies the network interface configurations to be attached to provisioned instances.
+             */
+            networkInterfaces?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecNetworkInterfacesPatch>[] | undefined>;
+            placementGroupSelector?: pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecPlacementGroupSelectorPatch | undefined>;
+            /**
+             * Role is the AWS identity that nodes use.
+             * This field is mutually exclusive from instanceProfile.
+             */
+            role?: pulumi.Input<string | undefined>;
+            /**
+             * SecurityGroupSelectorTerms is a list of security group selector terms. The terms are ORed.
+             */
+            securityGroupSelectorTerms?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecSecurityGroupSelectorTermsPatch>[] | undefined>;
+            /**
+             * SubnetSelectorTerms is a list of subnet selector terms. The terms are ORed.
+             */
+            subnetSelectorTerms?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassSpecSubnetSelectorTermsPatch>[] | undefined>;
+            /**
+             * Tags to be applied on ec2 resources like instances and launch templates.
+             */
+            tags?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
+            /**
+             * UserData to be applied to the provisioned nodes.
+             * It must be in the appropriate format based on the AMIFamily in use. Karpenter will merge certain fields into
+             * this UserData to ensure nodes are being provisioned with the correct configuration.
+             */
+            userData?: pulumi.Input<string | undefined>;
         }
 
         /**
          * PlacementGroupSelector defines the name or the id of the placement to resolve with the nodeclass.
          */
-        export interface EC2NodeClassSpecPlacementGroupSelectorArgs {
+        export interface EC2NodeClassSpecPlacementGroupSelector {
             /**
              * ID is the placement group id in EC2
              */
-            id?: pulumi.Input<string>;
+            id?: pulumi.Input<string | undefined>;
             /**
              * Name is the placement group name in EC2
              */
-            name?: pulumi.Input<string>;
+            name?: pulumi.Input<string | undefined>;
+        }
+
+        /**
+         * PlacementGroupSelector defines the name or the id of the placement to resolve with the nodeclass.
+         */
+        export interface EC2NodeClassSpecPlacementGroupSelectorPatch {
+            /**
+             * ID is the placement group id in EC2
+             */
+            id?: pulumi.Input<string | undefined>;
+            /**
+             * Name is the placement group name in EC2
+             */
+            name?: pulumi.Input<string | undefined>;
         }
 
         /**
          * SecurityGroupSelectorTerm defines selection logic for a security group used by Karpenter to launch nodes.
          * If multiple fields are used for selection, the requirements are ANDed.
          */
-        export interface EC2NodeClassSpecSecurityGroupSelectorTermsArgs {
+        export interface EC2NodeClassSpecSecurityGroupSelectorTerms {
             /**
              * ID is the security group id in EC2
              */
-            id?: pulumi.Input<string>;
+            id?: pulumi.Input<string | undefined>;
             /**
              * Name is the security group name in EC2.
              * This value is the name field, which is different from the name tag.
              */
-            name?: pulumi.Input<string>;
+            name?: pulumi.Input<string | undefined>;
             /**
              * Tags is a map of key/value tags used to select security groups.
              * Specifying '*' for a value selects all values for a given tag key.
              */
-            tags?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
+            tags?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
+        }
+
+        /**
+         * SecurityGroupSelectorTerm defines selection logic for a security group used by Karpenter to launch nodes.
+         * If multiple fields are used for selection, the requirements are ANDed.
+         */
+        export interface EC2NodeClassSpecSecurityGroupSelectorTermsPatch {
+            /**
+             * ID is the security group id in EC2
+             */
+            id?: pulumi.Input<string | undefined>;
+            /**
+             * Name is the security group name in EC2.
+             * This value is the name field, which is different from the name tag.
+             */
+            name?: pulumi.Input<string | undefined>;
+            /**
+             * Tags is a map of key/value tags used to select security groups.
+             * Specifying '*' for a value selects all values for a given tag key.
+             */
+            tags?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
         }
 
         /**
          * SubnetSelectorTerm defines selection logic for a subnet used by Karpenter to launch nodes.
          * If multiple fields are used for selection, the requirements are ANDed.
          */
-        export interface EC2NodeClassSpecSubnetSelectorTermsArgs {
+        export interface EC2NodeClassSpecSubnetSelectorTerms {
             /**
              * ID is the subnet id in EC2
              */
-            id?: pulumi.Input<string>;
+            id?: pulumi.Input<string | undefined>;
             /**
              * Tags is a map of key/value tags used to select subnets
              * Specifying '*' for a value selects all values for a given tag key.
              */
-            tags?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
+            tags?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
+        }
+
+        /**
+         * SubnetSelectorTerm defines selection logic for a subnet used by Karpenter to launch nodes.
+         * If multiple fields are used for selection, the requirements are ANDed.
+         */
+        export interface EC2NodeClassSpecSubnetSelectorTermsPatch {
+            /**
+             * ID is the subnet id in EC2
+             */
+            id?: pulumi.Input<string | undefined>;
+            /**
+             * Tags is a map of key/value tags used to select subnets
+             * Specifying '*' for a value selects all values for a given tag key.
+             */
+            tags?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
         }
 
         /**
          * EC2NodeClassStatus contains the resolved state of the EC2NodeClass
          */
-        export interface EC2NodeClassStatusArgs {
+        export interface EC2NodeClassStatus {
             /**
              * AMI contains the current AMI values that are available to the
              * cluster under the AMI selectors.
              */
-            amis?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassStatusAmisArgs>[]>;
+            amis?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassStatusAmis>[] | undefined>;
             /**
              * CapacityReservations contains the current capacity reservation values that are available to this NodeClass under the
              * CapacityReservation selectors.
              */
-            capacityReservations?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassStatusCapacityReservationsArgs>[]>;
+            capacityReservations?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassStatusCapacityReservations>[] | undefined>;
             /**
              * Conditions contains signals for health and readiness
              */
-            conditions?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassStatusConditionsArgs>[]>;
+            conditions?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassStatusConditions>[] | undefined>;
             /**
              * InstanceProfile contains the resolved instance profile for the role
              */
-            instanceProfile?: pulumi.Input<string>;
+            instanceProfile?: pulumi.Input<string | undefined>;
             /**
              * SecurityGroups contains the current security group values that are available to the
              * cluster under the SecurityGroups selectors.
              */
-            securityGroups?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassStatusSecurityGroupsArgs>[]>;
+            securityGroups?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassStatusSecurityGroups>[] | undefined>;
             /**
              * Subnets contains the current subnet values that are available to the
              * cluster under the subnet selectors.
              */
-            subnets?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassStatusSubnetsArgs>[]>;
+            subnets?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassStatusSubnets>[] | undefined>;
         }
 
         /**
          * AMI contains resolved AMI selector values utilized for node launch
          */
-        export interface EC2NodeClassStatusAmisArgs {
+        export interface EC2NodeClassStatusAmis {
             /**
              * Deprecation status of the AMI
              */
-            deprecated?: pulumi.Input<boolean>;
+            deprecated?: pulumi.Input<boolean | undefined>;
             /**
              * ID of the AMI
              */
-            id: pulumi.Input<string>;
+            id?: pulumi.Input<string | undefined>;
             /**
              * Name of the AMI
              */
-            name?: pulumi.Input<string>;
+            name?: pulumi.Input<string | undefined>;
             /**
              * Requirements of the AMI to be utilized on an instance type
              */
-            requirements: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassStatusAmisRequirementsArgs>[]>;
+            requirements?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.EC2NodeClassStatusAmisRequirements>[] | undefined>;
         }
 
         /**
          * A node selector requirement is a selector that contains values, a key, and an operator
          * that relates the key and values.
          */
-        export interface EC2NodeClassStatusAmisRequirementsArgs {
+        export interface EC2NodeClassStatusAmisRequirements {
             /**
              * The label key that the selector applies to.
              */
-            key: pulumi.Input<string>;
+            key?: pulumi.Input<string | undefined>;
             /**
              * Represents a key's relationship to a set of values.
              * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
              */
-            operator: pulumi.Input<string>;
+            operator?: pulumi.Input<string | undefined>;
             /**
              * An array of string values. If the operator is In or NotIn,
              * the values array must be non-empty. If the operator is Exists or DoesNotExist,
@@ -571,80 +979,70 @@ export namespace karpenter {
              * array must have a single element, which will be interpreted as an integer.
              * This array is replaced during a strategic merge patch.
              */
-            values?: pulumi.Input<pulumi.Input<string>[]>;
+            values?: pulumi.Input<pulumi.Input<string>[] | undefined>;
         }
 
-        export interface EC2NodeClassStatusCapacityReservationsArgs {
+        export interface EC2NodeClassStatusCapacityReservations {
             /**
              * The availability zone the capacity reservation is available in.
              */
-            availabilityZone: pulumi.Input<string>;
+            availabilityZone?: pulumi.Input<string | undefined>;
             /**
              * The time at which the capacity reservation expires. Once expired, the reserved capacity is released and Karpenter
              * will no longer be able to launch instances into that reservation.
              */
-            endTime?: pulumi.Input<string>;
+            endTime?: pulumi.Input<string | undefined>;
             /**
              * The id for the capacity reservation.
              */
-            id: pulumi.Input<string>;
+            id?: pulumi.Input<string | undefined>;
             /**
              * Indicates the type of instance launches the capacity reservation accepts.
              */
-            instanceMatchCriteria: pulumi.Input<string>;
+            instanceMatchCriteria?: pulumi.Input<string | undefined>;
             /**
              * The instance type for the capacity reservation.
              */
-            instanceType: pulumi.Input<string>;
+            instanceType?: pulumi.Input<string | undefined>;
             /**
              * Indicates whether this capacity reservation is interruptible
              */
-            interruptible?: pulumi.Input<boolean>;
+            interruptible?: pulumi.Input<boolean | undefined>;
             /**
              * The ID of the AWS account that owns the capacity reservation.
              */
-            ownerID: pulumi.Input<string>;
+            ownerID?: pulumi.Input<string | undefined>;
             /**
              * The type of capacity reservation.
              */
-            reservationType?: pulumi.Input<string>;
+            reservationType?: pulumi.Input<string | undefined>;
             /**
              * The state of the capacity reservation. A capacity reservation is considered to be expiring if it is within the EC2
              * reclaimation window. Only capacity-block reservations may be in this state.
              */
-            state?: pulumi.Input<string>;
-        }
-        /**
-         * ec2nodeClassStatusCapacityReservationsArgsProvideDefaults sets the appropriate defaults for EC2NodeClassStatusCapacityReservationsArgs
-         */
-        export function ec2nodeClassStatusCapacityReservationsArgsProvideDefaults(val: EC2NodeClassStatusCapacityReservationsArgs): EC2NodeClassStatusCapacityReservationsArgs {
-            return {
-                ...val,
-                reservationType: (val.reservationType) ?? "default",
-                state: (val.state) ?? "active",
-            };
+            state?: pulumi.Input<string | undefined>;
         }
 
         /**
          * Condition aliases the upstream type and adds additional helper methods
          */
-        export interface EC2NodeClassStatusConditionsArgs {
+        export interface EC2NodeClassStatusConditions {
             /**
              * lastTransitionTime is the last time the condition transitioned from one status to another.
              * This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
              */
-            lastTransitionTime: pulumi.Input<string>;
+            lastTransitionTime?: pulumi.Input<string | undefined>;
             /**
              * message is a human readable message indicating details about the transition.
              * This may be an empty string.
              */
-            message: pulumi.Input<string>;
+            message?: pulumi.Input<string | undefined>;
             /**
              * observedGeneration represents the .metadata.generation that the condition was set based upon.
              * For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
              * with respect to the current state of the instance.
              */
-            observedGeneration?: pulumi.Input<number>;
+            observedGeneration?: pulumi.Input<number | undefined>;
             /**
              * reason contains a programmatic identifier indicating the reason for the condition's last transition.
              * Producers of specific condition types may define expected values and meanings for this field,
@@ -652,83 +1050,97 @@ export namespace karpenter {
              * The value should be a CamelCase string.
              * This field may not be empty.
              */
-            reason: pulumi.Input<string>;
+            reason?: pulumi.Input<string | undefined>;
             /**
              * status of the condition, one of True, False, Unknown.
              */
-            status: pulumi.Input<string>;
+            status?: pulumi.Input<string | undefined>;
             /**
              * type of condition in CamelCase or in foo.example.com/CamelCase.
              */
-            type: pulumi.Input<string>;
+            type?: pulumi.Input<string | undefined>;
         }
 
         /**
          * SecurityGroup contains resolved SecurityGroup selector values utilized for node launch
          */
-        export interface EC2NodeClassStatusSecurityGroupsArgs {
+        export interface EC2NodeClassStatusSecurityGroups {
             /**
              * ID of the security group
              */
-            id: pulumi.Input<string>;
+            id?: pulumi.Input<string | undefined>;
             /**
              * Name of the security group
              */
-            name?: pulumi.Input<string>;
+            name?: pulumi.Input<string | undefined>;
         }
 
         /**
          * Subnet contains resolved Subnet selector values utilized for node launch
          */
-        export interface EC2NodeClassStatusSubnetsArgs {
+        export interface EC2NodeClassStatusSubnets {
             /**
              * ID of the subnet
              */
-            id: pulumi.Input<string>;
+            id?: pulumi.Input<string | undefined>;
             /**
              * The associated availability zone
              */
-            zone: pulumi.Input<string>;
+            zone?: pulumi.Input<string | undefined>;
             /**
              * The associated availability zone ID
              */
-            zoneID?: pulumi.Input<string>;
+            zoneID?: pulumi.Input<string | undefined>;
+        }
+
+        /**
+         * NodeClaim is the Schema for the NodeClaims API
+         */
+        export interface NodeClaim {
+            /**
+             * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+             */
+            apiVersion?: pulumi.Input<"karpenter.sh/v1" | undefined>;
+            /**
+             * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+             */
+            kind?: pulumi.Input<"NodeClaim" | undefined>;
+            /**
+             * Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+             */
+            metadata?: pulumi.Input<inputs.meta.v1.ObjectMeta | undefined>;
+            spec?: pulumi.Input<inputs.karpenter.v1.NodeClaimSpec | undefined>;
+            status?: pulumi.Input<inputs.karpenter.v1.NodeClaimStatus | undefined>;
         }
 
         /**
          * NodeClaimSpec describes the desired state of the NodeClaim
          */
-        export interface NodeClaimSpecArgs {
+        export interface NodeClaimSpec {
             /**
              * ExpireAfter is the duration the controller will wait
              * before terminating a node, measured from when the node is created. This
              * is useful to implement features like eventually consistent node upgrade,
              * memory leak protection, and disruption testing.
              */
-            expireAfter?: pulumi.Input<string>;
-            /**
-             * NodeClassRef is a reference to an object that defines provider specific configuration
-             */
-            nodeClassRef: pulumi.Input<inputs.karpenter.v1.NodeClaimSpecNodeClassRefArgs>;
+            expireAfter?: pulumi.Input<string | undefined>;
+            nodeClassRef?: pulumi.Input<inputs.karpenter.v1.NodeClaimSpecNodeClassRef | undefined>;
             /**
              * Requirements are layered with GetLabels and applied to every node.
              */
-            requirements: pulumi.Input<pulumi.Input<inputs.karpenter.v1.NodeClaimSpecRequirementsArgs>[]>;
-            /**
-             * Resources models the resource requirements for the NodeClaim to launch
-             */
-            resources?: pulumi.Input<inputs.karpenter.v1.NodeClaimSpecResourcesArgs>;
+            requirements?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.NodeClaimSpecRequirements>[] | undefined>;
+            resources?: pulumi.Input<inputs.karpenter.v1.NodeClaimSpecResources | undefined>;
             /**
              * StartupTaints are taints that are applied to nodes upon startup which are expected to be removed automatically
              * within a short period of time, typically by a DaemonSet that tolerates the taint. These are commonly used by
              * daemonsets to allow initialization and enforce startup ordering.  StartupTaints are ignored for provisioning
              * purposes in that pods are not required to tolerate a StartupTaint in order to have nodes provisioned for them.
              */
-            startupTaints?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.NodeClaimSpecStartupTaintsArgs>[]>;
+            startupTaints?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.NodeClaimSpecStartupTaints>[] | undefined>;
             /**
              * Taints will be applied to the NodeClaim's node.
              */
-            taints?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.NodeClaimSpecTaintsArgs>[]>;
+            taints?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.NodeClaimSpecTaints>[] | undefined>;
             /**
              * TerminationGracePeriod is the maximum duration the controller will wait before forcefully deleting the pods on a node, measured from when deletion is first initiated.
              *
@@ -744,55 +1156,110 @@ export namespace karpenter {
              * The feature can also be used to allow maximum time limits for long-running jobs which can delay node termination with preStop hooks.
              * If left undefined, the controller will wait indefinitely for pods to be drained.
              */
-            terminationGracePeriod?: pulumi.Input<string>;
-        }
-        /**
-         * nodeClaimSpecArgsProvideDefaults sets the appropriate defaults for NodeClaimSpecArgs
-         */
-        export function nodeClaimSpecArgsProvideDefaults(val: NodeClaimSpecArgs): NodeClaimSpecArgs {
-            return {
-                ...val,
-                expireAfter: (val.expireAfter) ?? "720h",
-            };
+            terminationGracePeriod?: pulumi.Input<string | undefined>;
         }
 
         /**
          * NodeClassRef is a reference to an object that defines provider specific configuration
          */
-        export interface NodeClaimSpecNodeClassRefArgs {
+        export interface NodeClaimSpecNodeClassRef {
             /**
              * API version of the referent
              */
-            group: pulumi.Input<string>;
+            group?: pulumi.Input<string | undefined>;
             /**
              * Kind of the referent; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
              */
-            kind: pulumi.Input<string>;
+            kind?: pulumi.Input<string | undefined>;
             /**
              * Name of the referent; More info: http://kubernetes.io/docs/user-guide/identifiers#names
              */
-            name: pulumi.Input<string>;
+            name?: pulumi.Input<string | undefined>;
+        }
+
+        /**
+         * NodeClassRef is a reference to an object that defines provider specific configuration
+         */
+        export interface NodeClaimSpecNodeClassRefPatch {
+            /**
+             * API version of the referent
+             */
+            group?: pulumi.Input<string | undefined>;
+            /**
+             * Kind of the referent; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+             */
+            kind?: pulumi.Input<string | undefined>;
+            /**
+             * Name of the referent; More info: http://kubernetes.io/docs/user-guide/identifiers#names
+             */
+            name?: pulumi.Input<string | undefined>;
+        }
+
+        /**
+         * NodeClaimSpec describes the desired state of the NodeClaim
+         */
+        export interface NodeClaimSpecPatch {
+            /**
+             * ExpireAfter is the duration the controller will wait
+             * before terminating a node, measured from when the node is created. This
+             * is useful to implement features like eventually consistent node upgrade,
+             * memory leak protection, and disruption testing.
+             */
+            expireAfter?: pulumi.Input<string | undefined>;
+            nodeClassRef?: pulumi.Input<inputs.karpenter.v1.NodeClaimSpecNodeClassRefPatch | undefined>;
+            /**
+             * Requirements are layered with GetLabels and applied to every node.
+             */
+            requirements?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.NodeClaimSpecRequirementsPatch>[] | undefined>;
+            resources?: pulumi.Input<inputs.karpenter.v1.NodeClaimSpecResourcesPatch | undefined>;
+            /**
+             * StartupTaints are taints that are applied to nodes upon startup which are expected to be removed automatically
+             * within a short period of time, typically by a DaemonSet that tolerates the taint. These are commonly used by
+             * daemonsets to allow initialization and enforce startup ordering.  StartupTaints are ignored for provisioning
+             * purposes in that pods are not required to tolerate a StartupTaint in order to have nodes provisioned for them.
+             */
+            startupTaints?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.NodeClaimSpecStartupTaintsPatch>[] | undefined>;
+            /**
+             * Taints will be applied to the NodeClaim's node.
+             */
+            taints?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.NodeClaimSpecTaintsPatch>[] | undefined>;
+            /**
+             * TerminationGracePeriod is the maximum duration the controller will wait before forcefully deleting the pods on a node, measured from when deletion is first initiated.
+             *
+             * Warning: this feature takes precedence over a Pod's terminationGracePeriodSeconds value, and bypasses any blocked PDBs or the karpenter.sh/do-not-disrupt annotation.
+             *
+             * This field is intended to be used by cluster administrators to enforce that nodes can be cycled within a given time period.
+             * When set, drifted nodes will begin draining even if there are pods blocking eviction. Draining will respect PDBs and the do-not-disrupt annotation until the TGP is reached.
+             *
+             * Karpenter will preemptively delete pods so their terminationGracePeriodSeconds align with the node's terminationGracePeriod.
+             * If a pod would be terminated without being granted its full terminationGracePeriodSeconds prior to the node timeout,
+             * that pod will be deleted at T = node timeout - pod terminationGracePeriodSeconds.
+             *
+             * The feature can also be used to allow maximum time limits for long-running jobs which can delay node termination with preStop hooks.
+             * If left undefined, the controller will wait indefinitely for pods to be drained.
+             */
+            terminationGracePeriod?: pulumi.Input<string | undefined>;
         }
 
         /**
          * A node selector requirement is a selector that contains values, a key, an operator that relates the key and values
          * and minValues that represent the requirement to have at least that many values.
          */
-        export interface NodeClaimSpecRequirementsArgs {
+        export interface NodeClaimSpecRequirements {
             /**
              * The label key that the selector applies to.
              */
-            key: pulumi.Input<string>;
+            key?: pulumi.Input<string | undefined>;
             /**
              * This field is ALPHA and can be dropped or replaced at any time
              * MinValues is the minimum number of unique values required to define the flexibility of the specific requirement.
              */
-            minValues?: pulumi.Input<number>;
+            minValues?: pulumi.Input<number | undefined>;
             /**
              * Represents a key's relationship to a set of values.
              * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, Lt, Gte, and Lte.
              */
-            operator: pulumi.Input<string>;
+            operator?: pulumi.Input<string | undefined>;
             /**
              * An array of string values. If the operator is In or NotIn,
              * the values array must be non-empty. If the operator is Exists or DoesNotExist,
@@ -800,125 +1267,214 @@ export namespace karpenter {
              * array must have a single element, which will be interpreted as an integer.
              * This array is replaced during a strategic merge patch.
              */
-            values?: pulumi.Input<pulumi.Input<string>[]>;
+            values?: pulumi.Input<pulumi.Input<string>[] | undefined>;
+        }
+
+        /**
+         * A node selector requirement is a selector that contains values, a key, an operator that relates the key and values
+         * and minValues that represent the requirement to have at least that many values.
+         */
+        export interface NodeClaimSpecRequirementsPatch {
+            /**
+             * The label key that the selector applies to.
+             */
+            key?: pulumi.Input<string | undefined>;
+            /**
+             * This field is ALPHA and can be dropped or replaced at any time
+             * MinValues is the minimum number of unique values required to define the flexibility of the specific requirement.
+             */
+            minValues?: pulumi.Input<number | undefined>;
+            /**
+             * Represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, Lt, Gte, and Lte.
+             */
+            operator?: pulumi.Input<string | undefined>;
+            /**
+             * An array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. If the operator is Gt, Lt, Gte, or Lte, the values
+             * array must have a single element, which will be interpreted as an integer.
+             * This array is replaced during a strategic merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[] | undefined>;
         }
 
         /**
          * Resources models the resource requirements for the NodeClaim to launch
          */
-        export interface NodeClaimSpecResourcesArgs {
+        export interface NodeClaimSpecResources {
             /**
              * Requests describes the minimum required resources for the NodeClaim to launch
              */
-            requests?: pulumi.Input<{[key: string]: pulumi.Input<number | string>}>;
+            requests?: pulumi.Input<{[key: string]: pulumi.Input<number | string>} | undefined>;
+        }
+
+        /**
+         * Resources models the resource requirements for the NodeClaim to launch
+         */
+        export interface NodeClaimSpecResourcesPatch {
+            /**
+             * Requests describes the minimum required resources for the NodeClaim to launch
+             */
+            requests?: pulumi.Input<{[key: string]: pulumi.Input<number | string>} | undefined>;
         }
 
         /**
          * The node this Taint is attached to has the "effect" on
          * any pod that does not tolerate the Taint.
          */
-        export interface NodeClaimSpecStartupTaintsArgs {
+        export interface NodeClaimSpecStartupTaints {
             /**
              * Required. The effect of the taint on pods
              * that do not tolerate the taint.
              * Valid effects are NoSchedule, PreferNoSchedule and NoExecute.
              */
-            effect: pulumi.Input<string>;
+            effect?: pulumi.Input<string | undefined>;
             /**
              * Required. The taint key to be applied to a node.
              */
-            key: pulumi.Input<string>;
+            key?: pulumi.Input<string | undefined>;
             /**
              * TimeAdded represents the time at which the taint was added.
              */
-            timeAdded?: pulumi.Input<string>;
+            timeAdded?: pulumi.Input<string | undefined>;
             /**
              * The taint value corresponding to the taint key.
              */
-            value?: pulumi.Input<string>;
+            value?: pulumi.Input<string | undefined>;
         }
 
         /**
          * The node this Taint is attached to has the "effect" on
          * any pod that does not tolerate the Taint.
          */
-        export interface NodeClaimSpecTaintsArgs {
+        export interface NodeClaimSpecStartupTaintsPatch {
             /**
              * Required. The effect of the taint on pods
              * that do not tolerate the taint.
              * Valid effects are NoSchedule, PreferNoSchedule and NoExecute.
              */
-            effect: pulumi.Input<string>;
+            effect?: pulumi.Input<string | undefined>;
             /**
              * Required. The taint key to be applied to a node.
              */
-            key: pulumi.Input<string>;
+            key?: pulumi.Input<string | undefined>;
             /**
              * TimeAdded represents the time at which the taint was added.
              */
-            timeAdded?: pulumi.Input<string>;
+            timeAdded?: pulumi.Input<string | undefined>;
             /**
              * The taint value corresponding to the taint key.
              */
-            value?: pulumi.Input<string>;
+            value?: pulumi.Input<string | undefined>;
+        }
+
+        /**
+         * The node this Taint is attached to has the "effect" on
+         * any pod that does not tolerate the Taint.
+         */
+        export interface NodeClaimSpecTaints {
+            /**
+             * Required. The effect of the taint on pods
+             * that do not tolerate the taint.
+             * Valid effects are NoSchedule, PreferNoSchedule and NoExecute.
+             */
+            effect?: pulumi.Input<string | undefined>;
+            /**
+             * Required. The taint key to be applied to a node.
+             */
+            key?: pulumi.Input<string | undefined>;
+            /**
+             * TimeAdded represents the time at which the taint was added.
+             */
+            timeAdded?: pulumi.Input<string | undefined>;
+            /**
+             * The taint value corresponding to the taint key.
+             */
+            value?: pulumi.Input<string | undefined>;
+        }
+
+        /**
+         * The node this Taint is attached to has the "effect" on
+         * any pod that does not tolerate the Taint.
+         */
+        export interface NodeClaimSpecTaintsPatch {
+            /**
+             * Required. The effect of the taint on pods
+             * that do not tolerate the taint.
+             * Valid effects are NoSchedule, PreferNoSchedule and NoExecute.
+             */
+            effect?: pulumi.Input<string | undefined>;
+            /**
+             * Required. The taint key to be applied to a node.
+             */
+            key?: pulumi.Input<string | undefined>;
+            /**
+             * TimeAdded represents the time at which the taint was added.
+             */
+            timeAdded?: pulumi.Input<string | undefined>;
+            /**
+             * The taint value corresponding to the taint key.
+             */
+            value?: pulumi.Input<string | undefined>;
         }
 
         /**
          * NodeClaimStatus defines the observed state of NodeClaim
          */
-        export interface NodeClaimStatusArgs {
+        export interface NodeClaimStatus {
             /**
              * Allocatable is the estimated allocatable capacity of the node
              */
-            allocatable?: pulumi.Input<{[key: string]: pulumi.Input<number | string>}>;
+            allocatable?: pulumi.Input<{[key: string]: pulumi.Input<number | string>} | undefined>;
             /**
              * Capacity is the estimated full capacity of the node
              */
-            capacity?: pulumi.Input<{[key: string]: pulumi.Input<number | string>}>;
+            capacity?: pulumi.Input<{[key: string]: pulumi.Input<number | string>} | undefined>;
             /**
              * Conditions contains signals for health and readiness
              */
-            conditions?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.NodeClaimStatusConditionsArgs>[]>;
+            conditions?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.NodeClaimStatusConditions>[] | undefined>;
             /**
              * ImageID is an identifier for the image that runs on the node
              */
-            imageID?: pulumi.Input<string>;
+            imageID?: pulumi.Input<string | undefined>;
             /**
              * LastPodEventTime is updated with the last time a pod was scheduled
              * or removed from the node. A pod going terminal or terminating
              * is also considered as removed.
              */
-            lastPodEventTime?: pulumi.Input<string>;
+            lastPodEventTime?: pulumi.Input<string | undefined>;
             /**
              * NodeName is the name of the corresponding node object
              */
-            nodeName?: pulumi.Input<string>;
+            nodeName?: pulumi.Input<string | undefined>;
             /**
              * ProviderID of the corresponding node object
              */
-            providerID?: pulumi.Input<string>;
+            providerID?: pulumi.Input<string | undefined>;
         }
 
         /**
          * Condition aliases the upstream type and adds additional helper methods
          */
-        export interface NodeClaimStatusConditionsArgs {
+        export interface NodeClaimStatusConditions {
             /**
              * lastTransitionTime is the last time the condition transitioned from one status to another.
              * This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
              */
-            lastTransitionTime: pulumi.Input<string>;
+            lastTransitionTime?: pulumi.Input<string | undefined>;
             /**
              * message is a human readable message indicating details about the transition.
              * This may be an empty string.
              */
-            message?: pulumi.Input<string>;
+            message?: pulumi.Input<string | undefined>;
             /**
              * observedGeneration represents the .metadata.generation that the condition was set based upon.
              * For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
              * with respect to the current state of the instance.
              */
-            observedGeneration?: pulumi.Input<number>;
+            observedGeneration?: pulumi.Input<number | undefined>;
             /**
              * reason contains a programmatic identifier indicating the reason for the condition's last transition.
              * Producers of specific condition types may define expected values and meanings for this field,
@@ -926,15 +1482,35 @@ export namespace karpenter {
              * The value should be a CamelCase string.
              * This field may not be empty.
              */
-            reason?: pulumi.Input<string>;
+            reason?: pulumi.Input<string | undefined>;
             /**
              * status of the condition, one of True, False, Unknown.
              */
-            status: pulumi.Input<string>;
+            status?: pulumi.Input<string | undefined>;
             /**
              * type of condition in CamelCase or in foo.example.com/CamelCase.
              */
-            type: pulumi.Input<string>;
+            type?: pulumi.Input<string | undefined>;
+        }
+
+        /**
+         * NodePool is the Schema for the NodePools API
+         */
+        export interface NodePool {
+            /**
+             * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+             */
+            apiVersion?: pulumi.Input<"karpenter.sh/v1" | undefined>;
+            /**
+             * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+             */
+            kind?: pulumi.Input<"NodePool" | undefined>;
+            /**
+             * Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+             */
+            metadata?: pulumi.Input<inputs.meta.v1.ObjectMeta | undefined>;
+            spec?: pulumi.Input<inputs.karpenter.v1.NodePoolSpec | undefined>;
+            status?: pulumi.Input<inputs.karpenter.v1.NodePoolStatus | undefined>;
         }
 
         /**
@@ -943,16 +1519,13 @@ export namespace karpenter {
          * is capable of managing a diverse set of nodes. Node properties are determined
          * from a combination of nodepool and pod scheduling constraints.
          */
-        export interface NodePoolSpecArgs {
-            /**
-             * Disruption contains the parameters that relate to Karpenter's disruption logic
-             */
-            disruption?: pulumi.Input<inputs.karpenter.v1.NodePoolSpecDisruptionArgs>;
+        export interface NodePoolSpec {
+            disruption?: pulumi.Input<inputs.karpenter.v1.NodePoolSpecDisruption | undefined>;
             /**
              * Limits define a set of bounds for provisioning capacity.
              * Limits other than limits.nodes is not supported when replicas is set.
              */
-            limits?: pulumi.Input<{[key: string]: pulumi.Input<number | string>}>;
+            limits?: pulumi.Input<{[key: string]: pulumi.Input<number | string>} | undefined>;
             /**
              * Replicas is the desired number of nodes for the NodePool. When specified, the NodePool will
              * maintain this fixed number of replicas rather than scaling based on pod demand.
@@ -964,12 +1537,8 @@ export namespace karpenter {
              *   - Weight is not supported.
              * Note: This field is alpha.
              */
-            replicas?: pulumi.Input<number>;
-            /**
-             * Template contains the template of possibilities for the provisioning logic to launch a NodeClaim with.
-             * NodeClaims launched from this NodePool will often be further constrained than the template specifies.
-             */
-            template: pulumi.Input<inputs.karpenter.v1.NodePoolSpecTemplateArgs>;
+            replicas?: pulumi.Input<number | undefined>;
+            template?: pulumi.Input<inputs.karpenter.v1.NodePoolSpecTemplate | undefined>;
             /**
              * Weight is the priority given to the nodepool during scheduling. A higher
              * numerical weight indicates that this nodepool will be ordered
@@ -977,59 +1546,40 @@ export namespace karpenter {
              * will be treated as if it is a nodepool with a weight of 0.
              * Weight is not supported when replicas is set.
              */
-            weight?: pulumi.Input<number>;
-        }
-        /**
-         * nodePoolSpecArgsProvideDefaults sets the appropriate defaults for NodePoolSpecArgs
-         */
-        export function nodePoolSpecArgsProvideDefaults(val: NodePoolSpecArgs): NodePoolSpecArgs {
-            return {
-                ...val,
-                disruption: (val.disruption ? pulumi.output(val.disruption).apply(inputs.karpenter.v1.nodePoolSpecDisruptionArgsProvideDefaults) : undefined),
-                template: pulumi.output(val.template).apply(inputs.karpenter.v1.nodePoolSpecTemplateArgsProvideDefaults),
-            };
+            weight?: pulumi.Input<number | undefined>;
         }
 
         /**
          * Disruption contains the parameters that relate to Karpenter's disruption logic
          */
-        export interface NodePoolSpecDisruptionArgs {
+        export interface NodePoolSpecDisruption {
             /**
              * Budgets is a list of Budgets.
              * If there are multiple active budgets, Karpenter uses
              * the most restrictive value. If left undefined,
              * this will default to one budget with a value to 10%.
              */
-            budgets?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.NodePoolSpecDisruptionBudgetsArgs>[]>;
+            budgets?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.NodePoolSpecDisruptionBudgets>[] | undefined>;
             /**
              * ConsolidateAfter is the duration the controller will wait
              * before attempting to terminate nodes that are underutilized.
              * Refer to ConsolidationPolicy for how underutilization is considered.
              * When replicas is set, ConsolidateAfter is simply ignored
              */
-            consolidateAfter: pulumi.Input<string>;
+            consolidateAfter?: pulumi.Input<string | undefined>;
             /**
              * ConsolidationPolicy describes which nodes Karpenter can disrupt through its consolidation
              * algorithm. This policy defaults to "WhenEmptyOrUnderutilized" if not specified
              * When replicas is set, ConsolidationPolicy is simply ignored
              */
-            consolidationPolicy?: pulumi.Input<string>;
-        }
-        /**
-         * nodePoolSpecDisruptionArgsProvideDefaults sets the appropriate defaults for NodePoolSpecDisruptionArgs
-         */
-        export function nodePoolSpecDisruptionArgsProvideDefaults(val: NodePoolSpecDisruptionArgs): NodePoolSpecDisruptionArgs {
-            return {
-                ...val,
-                consolidationPolicy: (val.consolidationPolicy) ?? "WhenEmptyOrUnderutilized",
-            };
+            consolidationPolicy?: pulumi.Input<string | undefined>;
         }
 
         /**
          * Budget defines when Karpenter will restrict the
          * number of Node Claims that can be terminating simultaneously.
          */
-        export interface NodePoolSpecDisruptionBudgetsArgs {
+        export interface NodePoolSpecDisruptionBudgets {
             /**
              * Duration determines how long a Budget is active since each Schedule hit.
              * Only minutes and hours are accepted, as cron does not work in seconds.
@@ -1038,7 +1588,7 @@ export namespace karpenter {
              * This regex has an optional 0s at the end since the duration.String() always adds
              * a 0s at the end.
              */
-            duration?: pulumi.Input<string>;
+            duration?: pulumi.Input<string | undefined>;
             /**
              * Nodes dictates the maximum number of NodeClaims owned by this NodePool
              * that can be terminating at once. This is calculated by counting nodes that
@@ -1048,69 +1598,173 @@ export namespace karpenter {
              * checking for int nodes for IntOrString nodes.
              * Ref: https://github.com/kubernetes-sigs/controller-tools/blob/55efe4be40394a288216dab63156b0a64fb82929/pkg/crd/markers/validation.go#L379-L388
              */
-            nodes: pulumi.Input<string>;
+            nodes?: pulumi.Input<string | undefined>;
             /**
              * Reasons is a list of disruption methods that this budget applies to. If Reasons is not set, this budget applies to all methods.
              * Otherwise, this will apply to each reason defined.
              * allowed reasons are Underutilized, Empty, and Drifted.
              */
-            reasons?: pulumi.Input<pulumi.Input<string>[]>;
+            reasons?: pulumi.Input<pulumi.Input<string>[] | undefined>;
             /**
              * Schedule specifies when a budget begins being active, following
              * the upstream cronjob syntax. If omitted, the budget is always active.
              * Timezones are not supported.
              * This field is required if Duration is set.
              */
-            schedule?: pulumi.Input<string>;
+            schedule?: pulumi.Input<string | undefined>;
         }
+
         /**
-         * nodePoolSpecDisruptionBudgetsArgsProvideDefaults sets the appropriate defaults for NodePoolSpecDisruptionBudgetsArgs
+         * Budget defines when Karpenter will restrict the
+         * number of Node Claims that can be terminating simultaneously.
          */
-        export function nodePoolSpecDisruptionBudgetsArgsProvideDefaults(val: NodePoolSpecDisruptionBudgetsArgs): NodePoolSpecDisruptionBudgetsArgs {
-            return {
-                ...val,
-                nodes: (val.nodes) ?? "10%",
-            };
+        export interface NodePoolSpecDisruptionBudgetsPatch {
+            /**
+             * Duration determines how long a Budget is active since each Schedule hit.
+             * Only minutes and hours are accepted, as cron does not work in seconds.
+             * If omitted, the budget is always active.
+             * This is required if Schedule is set.
+             * This regex has an optional 0s at the end since the duration.String() always adds
+             * a 0s at the end.
+             */
+            duration?: pulumi.Input<string | undefined>;
+            /**
+             * Nodes dictates the maximum number of NodeClaims owned by this NodePool
+             * that can be terminating at once. This is calculated by counting nodes that
+             * have a deletion timestamp set, or are actively being deleted by Karpenter.
+             * This field is required when specifying a budget.
+             * This cannot be of type intstr.IntOrString since kubebuilder doesn't support pattern
+             * checking for int nodes for IntOrString nodes.
+             * Ref: https://github.com/kubernetes-sigs/controller-tools/blob/55efe4be40394a288216dab63156b0a64fb82929/pkg/crd/markers/validation.go#L379-L388
+             */
+            nodes?: pulumi.Input<string | undefined>;
+            /**
+             * Reasons is a list of disruption methods that this budget applies to. If Reasons is not set, this budget applies to all methods.
+             * Otherwise, this will apply to each reason defined.
+             * allowed reasons are Underutilized, Empty, and Drifted.
+             */
+            reasons?: pulumi.Input<pulumi.Input<string>[] | undefined>;
+            /**
+             * Schedule specifies when a budget begins being active, following
+             * the upstream cronjob syntax. If omitted, the budget is always active.
+             * Timezones are not supported.
+             * This field is required if Duration is set.
+             */
+            schedule?: pulumi.Input<string | undefined>;
+        }
+
+        /**
+         * Disruption contains the parameters that relate to Karpenter's disruption logic
+         */
+        export interface NodePoolSpecDisruptionPatch {
+            /**
+             * Budgets is a list of Budgets.
+             * If there are multiple active budgets, Karpenter uses
+             * the most restrictive value. If left undefined,
+             * this will default to one budget with a value to 10%.
+             */
+            budgets?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.NodePoolSpecDisruptionBudgetsPatch>[] | undefined>;
+            /**
+             * ConsolidateAfter is the duration the controller will wait
+             * before attempting to terminate nodes that are underutilized.
+             * Refer to ConsolidationPolicy for how underutilization is considered.
+             * When replicas is set, ConsolidateAfter is simply ignored
+             */
+            consolidateAfter?: pulumi.Input<string | undefined>;
+            /**
+             * ConsolidationPolicy describes which nodes Karpenter can disrupt through its consolidation
+             * algorithm. This policy defaults to "WhenEmptyOrUnderutilized" if not specified
+             * When replicas is set, ConsolidationPolicy is simply ignored
+             */
+            consolidationPolicy?: pulumi.Input<string | undefined>;
+        }
+
+        /**
+         * NodePoolSpec is the top level nodepool specification. Nodepools
+         * launch nodes in response to pods that are unschedulable. A single nodepool
+         * is capable of managing a diverse set of nodes. Node properties are determined
+         * from a combination of nodepool and pod scheduling constraints.
+         */
+        export interface NodePoolSpecPatch {
+            disruption?: pulumi.Input<inputs.karpenter.v1.NodePoolSpecDisruptionPatch | undefined>;
+            /**
+             * Limits define a set of bounds for provisioning capacity.
+             * Limits other than limits.nodes is not supported when replicas is set.
+             */
+            limits?: pulumi.Input<{[key: string]: pulumi.Input<number | string>} | undefined>;
+            /**
+             * Replicas is the desired number of nodes for the NodePool. When specified, the NodePool will
+             * maintain this fixed number of replicas rather than scaling based on pod demand.
+             * When replicas is set:
+             *   - The following fields are ignored:
+             *       * disruption.consolidationPolicy
+             *       * disruption.consolidateAfter
+             *   - Only limits.nodes is supported; other resource limits (e.g., CPU, memory) must not be specified.
+             *   - Weight is not supported.
+             * Note: This field is alpha.
+             */
+            replicas?: pulumi.Input<number | undefined>;
+            template?: pulumi.Input<inputs.karpenter.v1.NodePoolSpecTemplatePatch | undefined>;
+            /**
+             * Weight is the priority given to the nodepool during scheduling. A higher
+             * numerical weight indicates that this nodepool will be ordered
+             * ahead of other nodepools with lower weights. A nodepool with no weight
+             * will be treated as if it is a nodepool with a weight of 0.
+             * Weight is not supported when replicas is set.
+             */
+            weight?: pulumi.Input<number | undefined>;
         }
 
         /**
          * Template contains the template of possibilities for the provisioning logic to launch a NodeClaim with.
          * NodeClaims launched from this NodePool will often be further constrained than the template specifies.
          */
-        export interface NodePoolSpecTemplateArgs {
-            metadata?: pulumi.Input<inputs.karpenter.v1.NodePoolSpecTemplateMetadataArgs>;
-            /**
-             * NodeClaimTemplateSpec describes the desired state of the NodeClaim in the Nodepool
-             * NodeClaimTemplateSpec is used in the NodePool's NodeClaimTemplate, with the resource requests omitted since
-             * users are not able to set resource requests in the NodePool.
-             */
-            spec: pulumi.Input<inputs.karpenter.v1.NodePoolSpecTemplateSpecArgs>;
-        }
-        /**
-         * nodePoolSpecTemplateArgsProvideDefaults sets the appropriate defaults for NodePoolSpecTemplateArgs
-         */
-        export function nodePoolSpecTemplateArgsProvideDefaults(val: NodePoolSpecTemplateArgs): NodePoolSpecTemplateArgs {
-            return {
-                ...val,
-                spec: pulumi.output(val.spec).apply(inputs.karpenter.v1.nodePoolSpecTemplateSpecArgsProvideDefaults),
-            };
+        export interface NodePoolSpecTemplate {
+            metadata?: pulumi.Input<inputs.karpenter.v1.NodePoolSpecTemplateMetadata | undefined>;
+            spec?: pulumi.Input<inputs.karpenter.v1.NodePoolSpecTemplateSpec | undefined>;
         }
 
-        export interface NodePoolSpecTemplateMetadataArgs {
+        export interface NodePoolSpecTemplateMetadata {
             /**
              * Annotations is an unstructured key value map stored with a resource that may be
              * set by external tools to store and retrieve arbitrary metadata. They are not
              * queryable and should be preserved when modifying objects.
              * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations
              */
-            annotations?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
+            annotations?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
             /**
              * Map of string keys and values that can be used to organize and categorize
              * (scope and select) objects. May match selectors of replication controllers
              * and services.
              * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels
              */
-            labels?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
+            labels?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
+        }
+
+        export interface NodePoolSpecTemplateMetadataPatch {
+            /**
+             * Annotations is an unstructured key value map stored with a resource that may be
+             * set by external tools to store and retrieve arbitrary metadata. They are not
+             * queryable and should be preserved when modifying objects.
+             * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations
+             */
+            annotations?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
+            /**
+             * Map of string keys and values that can be used to organize and categorize
+             * (scope and select) objects. May match selectors of replication controllers
+             * and services.
+             * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels
+             */
+            labels?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
+        }
+
+        /**
+         * Template contains the template of possibilities for the provisioning logic to launch a NodeClaim with.
+         * NodeClaims launched from this NodePool will often be further constrained than the template specifies.
+         */
+        export interface NodePoolSpecTemplatePatch {
+            metadata?: pulumi.Input<inputs.karpenter.v1.NodePoolSpecTemplateMetadataPatch | undefined>;
+            spec?: pulumi.Input<inputs.karpenter.v1.NodePoolSpecTemplateSpecPatch | undefined>;
         }
 
         /**
@@ -1118,33 +1772,30 @@ export namespace karpenter {
          * NodeClaimTemplateSpec is used in the NodePool's NodeClaimTemplate, with the resource requests omitted since
          * users are not able to set resource requests in the NodePool.
          */
-        export interface NodePoolSpecTemplateSpecArgs {
+        export interface NodePoolSpecTemplateSpec {
             /**
              * ExpireAfter is the duration the controller will wait
              * before terminating a node, measured from when the node is created. This
              * is useful to implement features like eventually consistent node upgrade,
              * memory leak protection, and disruption testing.
              */
-            expireAfter?: pulumi.Input<string>;
-            /**
-             * NodeClassRef is a reference to an object that defines provider specific configuration
-             */
-            nodeClassRef: pulumi.Input<inputs.karpenter.v1.NodePoolSpecTemplateSpecNodeClassRefArgs>;
+            expireAfter?: pulumi.Input<string | undefined>;
+            nodeClassRef?: pulumi.Input<inputs.karpenter.v1.NodePoolSpecTemplateSpecNodeClassRef | undefined>;
             /**
              * Requirements are layered with GetLabels and applied to every node.
              */
-            requirements: pulumi.Input<pulumi.Input<inputs.karpenter.v1.NodePoolSpecTemplateSpecRequirementsArgs>[]>;
+            requirements?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.NodePoolSpecTemplateSpecRequirements>[] | undefined>;
             /**
              * StartupTaints are taints that are applied to nodes upon startup which are expected to be removed automatically
              * within a short period of time, typically by a DaemonSet that tolerates the taint. These are commonly used by
              * daemonsets to allow initialization and enforce startup ordering.  StartupTaints are ignored for provisioning
              * purposes in that pods are not required to tolerate a StartupTaint in order to have nodes provisioned for them.
              */
-            startupTaints?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.NodePoolSpecTemplateSpecStartupTaintsArgs>[]>;
+            startupTaints?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.NodePoolSpecTemplateSpecStartupTaints>[] | undefined>;
             /**
              * Taints will be applied to the NodeClaim's node.
              */
-            taints?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.NodePoolSpecTemplateSpecTaintsArgs>[]>;
+            taints?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.NodePoolSpecTemplateSpecTaints>[] | undefined>;
             /**
              * TerminationGracePeriod is the maximum duration the controller will wait before forcefully deleting the pods on a node, measured from when deletion is first initiated.
              *
@@ -1160,55 +1811,111 @@ export namespace karpenter {
              * The feature can also be used to allow maximum time limits for long-running jobs which can delay node termination with preStop hooks.
              * If left undefined, the controller will wait indefinitely for pods to be drained.
              */
-            terminationGracePeriod?: pulumi.Input<string>;
-        }
-        /**
-         * nodePoolSpecTemplateSpecArgsProvideDefaults sets the appropriate defaults for NodePoolSpecTemplateSpecArgs
-         */
-        export function nodePoolSpecTemplateSpecArgsProvideDefaults(val: NodePoolSpecTemplateSpecArgs): NodePoolSpecTemplateSpecArgs {
-            return {
-                ...val,
-                expireAfter: (val.expireAfter) ?? "720h",
-            };
+            terminationGracePeriod?: pulumi.Input<string | undefined>;
         }
 
         /**
          * NodeClassRef is a reference to an object that defines provider specific configuration
          */
-        export interface NodePoolSpecTemplateSpecNodeClassRefArgs {
+        export interface NodePoolSpecTemplateSpecNodeClassRef {
             /**
              * API version of the referent
              */
-            group: pulumi.Input<string>;
+            group?: pulumi.Input<string | undefined>;
             /**
              * Kind of the referent; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
              */
-            kind: pulumi.Input<string>;
+            kind?: pulumi.Input<string | undefined>;
             /**
              * Name of the referent; More info: http://kubernetes.io/docs/user-guide/identifiers#names
              */
-            name: pulumi.Input<string>;
+            name?: pulumi.Input<string | undefined>;
+        }
+
+        /**
+         * NodeClassRef is a reference to an object that defines provider specific configuration
+         */
+        export interface NodePoolSpecTemplateSpecNodeClassRefPatch {
+            /**
+             * API version of the referent
+             */
+            group?: pulumi.Input<string | undefined>;
+            /**
+             * Kind of the referent; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+             */
+            kind?: pulumi.Input<string | undefined>;
+            /**
+             * Name of the referent; More info: http://kubernetes.io/docs/user-guide/identifiers#names
+             */
+            name?: pulumi.Input<string | undefined>;
+        }
+
+        /**
+         * NodeClaimTemplateSpec describes the desired state of the NodeClaim in the Nodepool
+         * NodeClaimTemplateSpec is used in the NodePool's NodeClaimTemplate, with the resource requests omitted since
+         * users are not able to set resource requests in the NodePool.
+         */
+        export interface NodePoolSpecTemplateSpecPatch {
+            /**
+             * ExpireAfter is the duration the controller will wait
+             * before terminating a node, measured from when the node is created. This
+             * is useful to implement features like eventually consistent node upgrade,
+             * memory leak protection, and disruption testing.
+             */
+            expireAfter?: pulumi.Input<string | undefined>;
+            nodeClassRef?: pulumi.Input<inputs.karpenter.v1.NodePoolSpecTemplateSpecNodeClassRefPatch | undefined>;
+            /**
+             * Requirements are layered with GetLabels and applied to every node.
+             */
+            requirements?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.NodePoolSpecTemplateSpecRequirementsPatch>[] | undefined>;
+            /**
+             * StartupTaints are taints that are applied to nodes upon startup which are expected to be removed automatically
+             * within a short period of time, typically by a DaemonSet that tolerates the taint. These are commonly used by
+             * daemonsets to allow initialization and enforce startup ordering.  StartupTaints are ignored for provisioning
+             * purposes in that pods are not required to tolerate a StartupTaint in order to have nodes provisioned for them.
+             */
+            startupTaints?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.NodePoolSpecTemplateSpecStartupTaintsPatch>[] | undefined>;
+            /**
+             * Taints will be applied to the NodeClaim's node.
+             */
+            taints?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.NodePoolSpecTemplateSpecTaintsPatch>[] | undefined>;
+            /**
+             * TerminationGracePeriod is the maximum duration the controller will wait before forcefully deleting the pods on a node, measured from when deletion is first initiated.
+             *
+             * Warning: this feature takes precedence over a Pod's terminationGracePeriodSeconds value, and bypasses any blocked PDBs or the karpenter.sh/do-not-disrupt annotation.
+             *
+             * This field is intended to be used by cluster administrators to enforce that nodes can be cycled within a given time period.
+             * When set, drifted nodes will begin draining even if there are pods blocking eviction. Draining will respect PDBs and the do-not-disrupt annotation until the TGP is reached.
+             *
+             * Karpenter will preemptively delete pods so their terminationGracePeriodSeconds align with the node's terminationGracePeriod.
+             * If a pod would be terminated without being granted its full terminationGracePeriodSeconds prior to the node timeout,
+             * that pod will be deleted at T = node timeout - pod terminationGracePeriodSeconds.
+             *
+             * The feature can also be used to allow maximum time limits for long-running jobs which can delay node termination with preStop hooks.
+             * If left undefined, the controller will wait indefinitely for pods to be drained.
+             */
+            terminationGracePeriod?: pulumi.Input<string | undefined>;
         }
 
         /**
          * A node selector requirement is a selector that contains values, a key, an operator that relates the key and values
          * and minValues that represent the requirement to have at least that many values.
          */
-        export interface NodePoolSpecTemplateSpecRequirementsArgs {
+        export interface NodePoolSpecTemplateSpecRequirements {
             /**
              * The label key that the selector applies to.
              */
-            key: pulumi.Input<string>;
+            key?: pulumi.Input<string | undefined>;
             /**
              * This field is ALPHA and can be dropped or replaced at any time
              * MinValues is the minimum number of unique values required to define the flexibility of the specific requirement.
              */
-            minValues?: pulumi.Input<number>;
+            minValues?: pulumi.Input<number | undefined>;
             /**
              * Represents a key's relationship to a set of values.
              * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, Lt, Gte, and Lte.
              */
-            operator: pulumi.Input<string>;
+            operator?: pulumi.Input<string | undefined>;
             /**
              * An array of string values. If the operator is In or NotIn,
              * the values array must be non-empty. If the operator is Exists or DoesNotExist,
@@ -1216,111 +1923,181 @@ export namespace karpenter {
              * array must have a single element, which will be interpreted as an integer.
              * This array is replaced during a strategic merge patch.
              */
-            values?: pulumi.Input<pulumi.Input<string>[]>;
+            values?: pulumi.Input<pulumi.Input<string>[] | undefined>;
+        }
+
+        /**
+         * A node selector requirement is a selector that contains values, a key, an operator that relates the key and values
+         * and minValues that represent the requirement to have at least that many values.
+         */
+        export interface NodePoolSpecTemplateSpecRequirementsPatch {
+            /**
+             * The label key that the selector applies to.
+             */
+            key?: pulumi.Input<string | undefined>;
+            /**
+             * This field is ALPHA and can be dropped or replaced at any time
+             * MinValues is the minimum number of unique values required to define the flexibility of the specific requirement.
+             */
+            minValues?: pulumi.Input<number | undefined>;
+            /**
+             * Represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, Lt, Gte, and Lte.
+             */
+            operator?: pulumi.Input<string | undefined>;
+            /**
+             * An array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. If the operator is Gt, Lt, Gte, or Lte, the values
+             * array must have a single element, which will be interpreted as an integer.
+             * This array is replaced during a strategic merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[] | undefined>;
         }
 
         /**
          * The node this Taint is attached to has the "effect" on
          * any pod that does not tolerate the Taint.
          */
-        export interface NodePoolSpecTemplateSpecStartupTaintsArgs {
+        export interface NodePoolSpecTemplateSpecStartupTaints {
             /**
              * Required. The effect of the taint on pods
              * that do not tolerate the taint.
              * Valid effects are NoSchedule, PreferNoSchedule and NoExecute.
              */
-            effect: pulumi.Input<string>;
+            effect?: pulumi.Input<string | undefined>;
             /**
              * Required. The taint key to be applied to a node.
              */
-            key: pulumi.Input<string>;
+            key?: pulumi.Input<string | undefined>;
             /**
              * TimeAdded represents the time at which the taint was added.
              */
-            timeAdded?: pulumi.Input<string>;
+            timeAdded?: pulumi.Input<string | undefined>;
             /**
              * The taint value corresponding to the taint key.
              */
-            value?: pulumi.Input<string>;
+            value?: pulumi.Input<string | undefined>;
         }
 
         /**
          * The node this Taint is attached to has the "effect" on
          * any pod that does not tolerate the Taint.
          */
-        export interface NodePoolSpecTemplateSpecTaintsArgs {
+        export interface NodePoolSpecTemplateSpecStartupTaintsPatch {
             /**
              * Required. The effect of the taint on pods
              * that do not tolerate the taint.
              * Valid effects are NoSchedule, PreferNoSchedule and NoExecute.
              */
-            effect: pulumi.Input<string>;
+            effect?: pulumi.Input<string | undefined>;
             /**
              * Required. The taint key to be applied to a node.
              */
-            key: pulumi.Input<string>;
+            key?: pulumi.Input<string | undefined>;
             /**
              * TimeAdded represents the time at which the taint was added.
              */
-            timeAdded?: pulumi.Input<string>;
+            timeAdded?: pulumi.Input<string | undefined>;
             /**
              * The taint value corresponding to the taint key.
              */
-            value?: pulumi.Input<string>;
+            value?: pulumi.Input<string | undefined>;
+        }
+
+        /**
+         * The node this Taint is attached to has the "effect" on
+         * any pod that does not tolerate the Taint.
+         */
+        export interface NodePoolSpecTemplateSpecTaints {
+            /**
+             * Required. The effect of the taint on pods
+             * that do not tolerate the taint.
+             * Valid effects are NoSchedule, PreferNoSchedule and NoExecute.
+             */
+            effect?: pulumi.Input<string | undefined>;
+            /**
+             * Required. The taint key to be applied to a node.
+             */
+            key?: pulumi.Input<string | undefined>;
+            /**
+             * TimeAdded represents the time at which the taint was added.
+             */
+            timeAdded?: pulumi.Input<string | undefined>;
+            /**
+             * The taint value corresponding to the taint key.
+             */
+            value?: pulumi.Input<string | undefined>;
+        }
+
+        /**
+         * The node this Taint is attached to has the "effect" on
+         * any pod that does not tolerate the Taint.
+         */
+        export interface NodePoolSpecTemplateSpecTaintsPatch {
+            /**
+             * Required. The effect of the taint on pods
+             * that do not tolerate the taint.
+             * Valid effects are NoSchedule, PreferNoSchedule and NoExecute.
+             */
+            effect?: pulumi.Input<string | undefined>;
+            /**
+             * Required. The taint key to be applied to a node.
+             */
+            key?: pulumi.Input<string | undefined>;
+            /**
+             * TimeAdded represents the time at which the taint was added.
+             */
+            timeAdded?: pulumi.Input<string | undefined>;
+            /**
+             * The taint value corresponding to the taint key.
+             */
+            value?: pulumi.Input<string | undefined>;
         }
 
         /**
          * NodePoolStatus defines the observed state of NodePool
          */
-        export interface NodePoolStatusArgs {
+        export interface NodePoolStatus {
             /**
              * Conditions contains signals for health and readiness
              */
-            conditions?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.NodePoolStatusConditionsArgs>[]>;
+            conditions?: pulumi.Input<pulumi.Input<inputs.karpenter.v1.NodePoolStatusConditions>[] | undefined>;
             /**
              * NodeClassObservedGeneration represents the observed nodeClass generation for referenced nodeClass. If this does not match
              * the actual NodeClass Generation, NodeRegistrationHealthy status condition on the NodePool will be reset
              */
-            nodeClassObservedGeneration?: pulumi.Input<number>;
+            nodeClassObservedGeneration?: pulumi.Input<number | undefined>;
             /**
              * Nodes is the count of nodes associated with this NodePool
              */
-            nodes?: pulumi.Input<number>;
+            nodes?: pulumi.Input<number | undefined>;
             /**
              * Resources is the list of resources that have been provisioned.
              */
-            resources?: pulumi.Input<{[key: string]: pulumi.Input<number | string>}>;
-        }
-        /**
-         * nodePoolStatusArgsProvideDefaults sets the appropriate defaults for NodePoolStatusArgs
-         */
-        export function nodePoolStatusArgsProvideDefaults(val: NodePoolStatusArgs): NodePoolStatusArgs {
-            return {
-                ...val,
-                nodes: (val.nodes) ?? 0,
-            };
+            resources?: pulumi.Input<{[key: string]: pulumi.Input<number | string>} | undefined>;
         }
 
         /**
          * Condition aliases the upstream type and adds additional helper methods
          */
-        export interface NodePoolStatusConditionsArgs {
+        export interface NodePoolStatusConditions {
             /**
              * lastTransitionTime is the last time the condition transitioned from one status to another.
              * This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
              */
-            lastTransitionTime: pulumi.Input<string>;
+            lastTransitionTime?: pulumi.Input<string | undefined>;
             /**
              * message is a human readable message indicating details about the transition.
              * This may be an empty string.
              */
-            message: pulumi.Input<string>;
+            message?: pulumi.Input<string | undefined>;
             /**
              * observedGeneration represents the .metadata.generation that the condition was set based upon.
              * For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
              * with respect to the current state of the instance.
              */
-            observedGeneration?: pulumi.Input<number>;
+            observedGeneration?: pulumi.Input<number | undefined>;
             /**
              * reason contains a programmatic identifier indicating the reason for the condition's last transition.
              * Producers of specific condition types may define expected values and meanings for this field,
@@ -1328,15 +2105,346 @@ export namespace karpenter {
              * The value should be a CamelCase string.
              * This field may not be empty.
              */
-            reason: pulumi.Input<string>;
+            reason?: pulumi.Input<string | undefined>;
             /**
              * status of the condition, one of True, False, Unknown.
              */
-            status: pulumi.Input<string>;
+            status?: pulumi.Input<string | undefined>;
             /**
              * type of condition in CamelCase or in foo.example.com/CamelCase.
              */
-            type: pulumi.Input<string>;
+            type?: pulumi.Input<string | undefined>;
+        }
+
+    }
+}
+
+export namespace meta {
+    export namespace v1 {
+        /**
+         * ListMeta describes metadata that synthetic resources must have, including lists and various status objects. A resource may have only one of {ObjectMeta, ListMeta}.
+         */
+        export interface ListMeta {
+            /**
+             * continue may be set if the user set a limit on the number of items returned, and indicates that the server has more data available. The value is opaque and may be used to issue another request to the endpoint that served this list to retrieve the next set of available objects. Continuing a consistent list may not be possible if the server configuration has changed or more than a few minutes have passed. The resourceVersion field returned when using this continue value will be identical to the value in the first response, unless you have received this token from an error message.
+             */
+            continue?: pulumi.Input<string | undefined>;
+            /**
+             * remainingItemCount is the number of subsequent items in the list which are not included in this list response. If the list request contained label or field selectors, then the number of remaining items is unknown and the field will be left unset and omitted during serialization. If the list is complete (either because it is not chunking or because this is the last chunk), then there are no more remaining items and this field will be left unset and omitted during serialization. Servers older than v1.15 do not set this field. The intended use of the remainingItemCount is *estimating* the size of a collection. Clients should not rely on the remainingItemCount to be set or to be exact.
+             */
+            remainingItemCount?: pulumi.Input<number | undefined>;
+            /**
+             * String that identifies the server's internal version of this object that can be used by clients to determine when objects have changed. Value must be treated as opaque by clients and passed unmodified back to the server. Populated by the system. Read-only. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
+             */
+            resourceVersion?: pulumi.Input<string | undefined>;
+            /**
+             * Deprecated: selfLink is a legacy read-only field that is no longer populated by the system.
+             */
+            selfLink?: pulumi.Input<string | undefined>;
+            /**
+             * shardInfo is set when the list is a filtered subset of the full collection, as selected by a shard selector on the request. It echoes back the selector so clients can verify which shard they received and merge sharded responses. Clients should not cache sharded list responses as a full representation of the collection.
+             *
+             * This is an alpha field and requires enabling the ShardedListAndWatch feature gate.
+             */
+            shardInfo?: pulumi.Input<inputs.meta.v1.ShardInfo | undefined>;
+        }
+
+        /**
+         * ManagedFieldsEntry is a workflow-id, a FieldSet and the group version of the resource that the fieldset applies to.
+         */
+        export interface ManagedFieldsEntry {
+            /**
+             * APIVersion defines the version of this resource that this field set applies to. The format is "group/version" just like the top-level APIVersion field. It is necessary to track the version of a field set because it cannot be automatically converted.
+             */
+            apiVersion?: pulumi.Input<string | undefined>;
+            /**
+             * FieldsType is the discriminator for the different fields format and version. There is currently only one possible value: "FieldsV1"
+             */
+            fieldsType?: pulumi.Input<string | undefined>;
+            /**
+             * FieldsV1 holds the first JSON version format as described in the "FieldsV1" type.
+             */
+            fieldsV1?: any | undefined;
+            /**
+             * Manager is an identifier of the workflow managing these fields.
+             */
+            manager?: pulumi.Input<string | undefined>;
+            /**
+             * Operation is the type of operation which lead to this ManagedFieldsEntry being created. The only valid values for this field are 'Apply' and 'Update'.
+             */
+            operation?: pulumi.Input<string | undefined>;
+            /**
+             * Subresource is the name of the subresource used to update that object, or empty string if the object was updated through the main resource. The value of this field is used to distinguish between managers, even if they share the same name. For example, a status update will be distinct from a regular update using the same manager name. Note that the APIVersion field is not related to the Subresource field and it always corresponds to the version of the main resource.
+             */
+            subresource?: pulumi.Input<string | undefined>;
+            /**
+             * Time is the timestamp of when the ManagedFields entry was added. The timestamp will also be updated if a field is added, the manager changes any of the owned fields value or removes a field. The timestamp does not update when a field is removed from the entry because another manager took it over.
+             */
+            time?: pulumi.Input<string | undefined>;
+        }
+
+        /**
+         * ManagedFieldsEntry is a workflow-id, a FieldSet and the group version of the resource that the fieldset applies to.
+         */
+        export interface ManagedFieldsEntryPatch {
+            /**
+             * APIVersion defines the version of this resource that this field set applies to. The format is "group/version" just like the top-level APIVersion field. It is necessary to track the version of a field set because it cannot be automatically converted.
+             */
+            apiVersion?: pulumi.Input<string | undefined>;
+            /**
+             * FieldsType is the discriminator for the different fields format and version. There is currently only one possible value: "FieldsV1"
+             */
+            fieldsType?: pulumi.Input<string | undefined>;
+            /**
+             * FieldsV1 holds the first JSON version format as described in the "FieldsV1" type.
+             */
+            fieldsV1?: any | undefined;
+            /**
+             * Manager is an identifier of the workflow managing these fields.
+             */
+            manager?: pulumi.Input<string | undefined>;
+            /**
+             * Operation is the type of operation which lead to this ManagedFieldsEntry being created. The only valid values for this field are 'Apply' and 'Update'.
+             */
+            operation?: pulumi.Input<string | undefined>;
+            /**
+             * Subresource is the name of the subresource used to update that object, or empty string if the object was updated through the main resource. The value of this field is used to distinguish between managers, even if they share the same name. For example, a status update will be distinct from a regular update using the same manager name. Note that the APIVersion field is not related to the Subresource field and it always corresponds to the version of the main resource.
+             */
+            subresource?: pulumi.Input<string | undefined>;
+            /**
+             * Time is the timestamp of when the ManagedFields entry was added. The timestamp will also be updated if a field is added, the manager changes any of the owned fields value or removes a field. The timestamp does not update when a field is removed from the entry because another manager took it over.
+             */
+            time?: pulumi.Input<string | undefined>;
+        }
+
+        /**
+         * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
+         */
+        export interface ObjectMeta {
+            /**
+             * Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations
+             */
+            annotations?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
+            /**
+             * CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC.
+             *
+             * Populated by the system. Read-only. Null for lists. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+             */
+            creationTimestamp?: pulumi.Input<string | undefined>;
+            /**
+             * Number of seconds allowed for this object to gracefully terminate before it will be removed from the system. Only set when deletionTimestamp is also set. May only be shortened. Read-only.
+             */
+            deletionGracePeriodSeconds?: pulumi.Input<number | undefined>;
+            /**
+             * DeletionTimestamp is RFC 3339 date and time at which this resource will be deleted. This field is set by the server when a graceful deletion is requested by the user, and is not directly settable by a client. The resource is expected to be deleted (no longer visible from resource lists, and not reachable by name) after the time in this field, once the finalizers list is empty. As long as the finalizers list contains items, deletion is blocked. Once the deletionTimestamp is set, this value may not be unset or be set further into the future, although it may be shortened or the resource may be deleted prior to this time. For example, a user may request that a pod is deleted in 30 seconds. The Kubelet will react by sending a graceful termination signal to the containers in the pod. After that 30 seconds, the Kubelet will send a hard termination signal (SIGKILL) to the container and after cleanup, remove the pod from the API. In the presence of network partitions, this object may still exist after this timestamp, until an administrator or automated process can determine the resource is fully terminated. If not set, graceful deletion of the object has not been requested.
+             *
+             * Populated by the system when a graceful deletion is requested. Read-only. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+             */
+            deletionTimestamp?: pulumi.Input<string | undefined>;
+            /**
+             * Must be empty before the object is deleted from the registry. Each entry is an identifier for the responsible component that will remove the entry from the list. If the deletionTimestamp of the object is non-nil, entries in this list can only be removed. Finalizers may be processed and removed in any order.  Order is NOT enforced because it introduces significant risk of stuck finalizers. finalizers is a shared field, any actor with permission can reorder it. If the finalizer list is processed in order, then this can lead to a situation in which the component responsible for the first finalizer in the list is waiting for a signal (field value, external system, or other) produced by a component responsible for a finalizer later in the list, resulting in a deadlock. Without enforced ordering finalizers are free to order amongst themselves and are not vulnerable to ordering changes in the list.
+             */
+            finalizers?: pulumi.Input<pulumi.Input<string>[] | undefined>;
+            /**
+             * GenerateName is an optional prefix, used by the server, to generate a unique name ONLY IF the Name field has not been provided. If this field is used, the name returned to the client will be different than the name passed. This value will also be combined with a unique suffix. The provided value has the same validation rules as the Name field, and may be truncated by the length of the suffix required to make the value unique on the server.
+             *
+             * If this field is specified and the generated name exists, the server will return a 409.
+             *
+             * Applied only if Name is not specified. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#idempotency
+             */
+            generateName?: pulumi.Input<string | undefined>;
+            /**
+             * A sequence number representing a specific generation of the desired state. Populated by the system. Read-only.
+             */
+            generation?: pulumi.Input<number | undefined>;
+            /**
+             * Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels
+             */
+            labels?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
+            /**
+             * ManagedFields maps workflow-id and version to the set of fields that are managed by that workflow. This is mostly for internal housekeeping, and users typically shouldn't need to set or understand this field. A workflow can be the user's name, a controller's name, or the name of a specific apply path like "ci-cd". The set of fields is always in the version that the workflow used when modifying the object.
+             */
+            managedFields?: pulumi.Input<pulumi.Input<inputs.meta.v1.ManagedFieldsEntry>[] | undefined>;
+            /**
+             * Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
+             */
+            name?: pulumi.Input<string | undefined>;
+            /**
+             * Namespace defines the space within which each name must be unique. An empty namespace is equivalent to the "default" namespace, but "default" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty.
+             *
+             * Must be a DNS_LABEL. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces
+             */
+            namespace?: pulumi.Input<string | undefined>;
+            /**
+             * List of objects depended by this object. If ALL objects in the list have been deleted, this object will be garbage collected. If this object is managed by a controller, then an entry in this list will point to this controller, with the controller field set to true. There cannot be more than one managing controller.
+             */
+            ownerReferences?: pulumi.Input<pulumi.Input<inputs.meta.v1.OwnerReference>[] | undefined>;
+            /**
+             * An opaque value that represents the internal version of this object that can be used by clients to determine when objects have changed. May be used for optimistic concurrency, change detection, and the watch operation on a resource or set of resources. Clients must treat these values as opaque and passed unmodified back to the server. They may only be valid for a particular resource or set of resources.
+             *
+             * Populated by the system. Read-only. Value must be treated as opaque by clients and . More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
+             */
+            resourceVersion?: pulumi.Input<string | undefined>;
+            /**
+             * Deprecated: selfLink is a legacy read-only field that is no longer populated by the system.
+             */
+            selfLink?: pulumi.Input<string | undefined>;
+            /**
+             * UID is the unique in time and space value for this object. It is typically generated by the server on successful creation of a resource and is not allowed to change on PUT operations.
+             *
+             * Populated by the system. Read-only. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
+             */
+            uid?: pulumi.Input<string | undefined>;
+        }
+
+        /**
+         * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
+         */
+        export interface ObjectMetaPatch {
+            /**
+             * Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations
+             */
+            annotations?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
+            /**
+             * CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC.
+             *
+             * Populated by the system. Read-only. Null for lists. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+             */
+            creationTimestamp?: pulumi.Input<string | undefined>;
+            /**
+             * Number of seconds allowed for this object to gracefully terminate before it will be removed from the system. Only set when deletionTimestamp is also set. May only be shortened. Read-only.
+             */
+            deletionGracePeriodSeconds?: pulumi.Input<number | undefined>;
+            /**
+             * DeletionTimestamp is RFC 3339 date and time at which this resource will be deleted. This field is set by the server when a graceful deletion is requested by the user, and is not directly settable by a client. The resource is expected to be deleted (no longer visible from resource lists, and not reachable by name) after the time in this field, once the finalizers list is empty. As long as the finalizers list contains items, deletion is blocked. Once the deletionTimestamp is set, this value may not be unset or be set further into the future, although it may be shortened or the resource may be deleted prior to this time. For example, a user may request that a pod is deleted in 30 seconds. The Kubelet will react by sending a graceful termination signal to the containers in the pod. After that 30 seconds, the Kubelet will send a hard termination signal (SIGKILL) to the container and after cleanup, remove the pod from the API. In the presence of network partitions, this object may still exist after this timestamp, until an administrator or automated process can determine the resource is fully terminated. If not set, graceful deletion of the object has not been requested.
+             *
+             * Populated by the system when a graceful deletion is requested. Read-only. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+             */
+            deletionTimestamp?: pulumi.Input<string | undefined>;
+            /**
+             * Must be empty before the object is deleted from the registry. Each entry is an identifier for the responsible component that will remove the entry from the list. If the deletionTimestamp of the object is non-nil, entries in this list can only be removed. Finalizers may be processed and removed in any order.  Order is NOT enforced because it introduces significant risk of stuck finalizers. finalizers is a shared field, any actor with permission can reorder it. If the finalizer list is processed in order, then this can lead to a situation in which the component responsible for the first finalizer in the list is waiting for a signal (field value, external system, or other) produced by a component responsible for a finalizer later in the list, resulting in a deadlock. Without enforced ordering finalizers are free to order amongst themselves and are not vulnerable to ordering changes in the list.
+             */
+            finalizers?: pulumi.Input<pulumi.Input<string>[] | undefined>;
+            /**
+             * GenerateName is an optional prefix, used by the server, to generate a unique name ONLY IF the Name field has not been provided. If this field is used, the name returned to the client will be different than the name passed. This value will also be combined with a unique suffix. The provided value has the same validation rules as the Name field, and may be truncated by the length of the suffix required to make the value unique on the server.
+             *
+             * If this field is specified and the generated name exists, the server will return a 409.
+             *
+             * Applied only if Name is not specified. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#idempotency
+             */
+            generateName?: pulumi.Input<string | undefined>;
+            /**
+             * A sequence number representing a specific generation of the desired state. Populated by the system. Read-only.
+             */
+            generation?: pulumi.Input<number | undefined>;
+            /**
+             * Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels
+             */
+            labels?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
+            /**
+             * ManagedFields maps workflow-id and version to the set of fields that are managed by that workflow. This is mostly for internal housekeeping, and users typically shouldn't need to set or understand this field. A workflow can be the user's name, a controller's name, or the name of a specific apply path like "ci-cd". The set of fields is always in the version that the workflow used when modifying the object.
+             */
+            managedFields?: pulumi.Input<pulumi.Input<inputs.meta.v1.ManagedFieldsEntryPatch>[] | undefined>;
+            /**
+             * Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
+             */
+            name?: pulumi.Input<string | undefined>;
+            /**
+             * Namespace defines the space within which each name must be unique. An empty namespace is equivalent to the "default" namespace, but "default" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty.
+             *
+             * Must be a DNS_LABEL. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces
+             */
+            namespace?: pulumi.Input<string | undefined>;
+            /**
+             * List of objects depended by this object. If ALL objects in the list have been deleted, this object will be garbage collected. If this object is managed by a controller, then an entry in this list will point to this controller, with the controller field set to true. There cannot be more than one managing controller.
+             */
+            ownerReferences?: pulumi.Input<pulumi.Input<inputs.meta.v1.OwnerReferencePatch>[] | undefined>;
+            /**
+             * An opaque value that represents the internal version of this object that can be used by clients to determine when objects have changed. May be used for optimistic concurrency, change detection, and the watch operation on a resource or set of resources. Clients must treat these values as opaque and passed unmodified back to the server. They may only be valid for a particular resource or set of resources.
+             *
+             * Populated by the system. Read-only. Value must be treated as opaque by clients and . More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
+             */
+            resourceVersion?: pulumi.Input<string | undefined>;
+            /**
+             * Deprecated: selfLink is a legacy read-only field that is no longer populated by the system.
+             */
+            selfLink?: pulumi.Input<string | undefined>;
+            /**
+             * UID is the unique in time and space value for this object. It is typically generated by the server on successful creation of a resource and is not allowed to change on PUT operations.
+             *
+             * Populated by the system. Read-only. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
+             */
+            uid?: pulumi.Input<string | undefined>;
+        }
+
+        /**
+         * OwnerReference contains enough information to let you identify an owning object. An owning object must be in the same namespace as the dependent, or be cluster-scoped, so there is no namespace field.
+         */
+        export interface OwnerReference {
+            /**
+             * API version of the referent.
+             */
+            apiVersion: pulumi.Input<string>;
+            /**
+             * If true, AND if the owner has the "foregroundDeletion" finalizer, then the owner cannot be deleted from the key-value store until this reference is removed. See https://kubernetes.io/docs/concepts/architecture/garbage-collection/#foreground-deletion for how the garbage collector interacts with this field and enforces the foreground deletion. Defaults to false. To set this field, a user needs "delete" permission of the owner, otherwise 422 (Unprocessable Entity) will be returned.
+             */
+            blockOwnerDeletion?: pulumi.Input<boolean | undefined>;
+            /**
+             * If true, this reference points to the managing controller.
+             */
+            controller?: pulumi.Input<boolean | undefined>;
+            /**
+             * Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+             */
+            kind: pulumi.Input<string>;
+            /**
+             * Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
+             */
+            name: pulumi.Input<string>;
+            /**
+             * UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
+             */
+            uid: pulumi.Input<string>;
+        }
+
+        /**
+         * OwnerReference contains enough information to let you identify an owning object. An owning object must be in the same namespace as the dependent, or be cluster-scoped, so there is no namespace field.
+         */
+        export interface OwnerReferencePatch {
+            /**
+             * API version of the referent.
+             */
+            apiVersion?: pulumi.Input<string | undefined>;
+            /**
+             * If true, AND if the owner has the "foregroundDeletion" finalizer, then the owner cannot be deleted from the key-value store until this reference is removed. See https://kubernetes.io/docs/concepts/architecture/garbage-collection/#foreground-deletion for how the garbage collector interacts with this field and enforces the foreground deletion. Defaults to false. To set this field, a user needs "delete" permission of the owner, otherwise 422 (Unprocessable Entity) will be returned.
+             */
+            blockOwnerDeletion?: pulumi.Input<boolean | undefined>;
+            /**
+             * If true, this reference points to the managing controller.
+             */
+            controller?: pulumi.Input<boolean | undefined>;
+            /**
+             * Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+             */
+            kind?: pulumi.Input<string | undefined>;
+            /**
+             * Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
+             */
+            name?: pulumi.Input<string | undefined>;
+            /**
+             * UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
+             */
+            uid?: pulumi.Input<string | undefined>;
+        }
+
+        /**
+         * ShardInfo describes the shard selector that was applied to produce a list response. Its presence on a list response indicates the list is a filtered subset.
+         */
+        export interface ShardInfo {
+            /**
+             * selector is the shard selector string from the request, echoed back so clients can verify which shard they received and merge responses from multiple shards.
+             */
+            selector: pulumi.Input<string>;
         }
 
     }

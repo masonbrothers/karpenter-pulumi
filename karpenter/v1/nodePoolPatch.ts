@@ -7,33 +7,39 @@ import * as outputs from "../../types/output";
 import * as utilities from "../../utilities";
 
 /**
- * NodeClaim is the Schema for the NodeClaims API
+ * Patch resources are used to modify existing Kubernetes resources by using
+ * Server-Side Apply updates. The name of the resource must be specified, but all other properties are optional. More than
+ * one patch may be applied to the same resource, and a random FieldManager name will be used for each Patch resource.
+ * Conflicts will result in an error by default, but can be forced using the "pulumi.com/patchForce" annotation. See the
+ * [Server-Side Apply Docs](https://www.pulumi.com/registry/packages/kubernetes/how-to-guides/managing-resources-with-server-side-apply/) for
+ * additional information about using Server-Side Apply to manage Kubernetes resources with Pulumi.
+ * NodePool is the Schema for the NodePools API
  */
-export class NodeClaim extends pulumi.CustomResource {
+export class NodePoolPatch extends pulumi.CustomResource {
     /**
-     * Get an existing NodeClaim resource's state with the given name, ID, and optional extra
+     * Get an existing NodePoolPatch resource's state with the given name, ID, and optional extra
      * properties used to qualify the lookup.
      *
      * @param name The _unique_ name of the resulting resource.
      * @param id The _unique_ provider ID of the resource to lookup.
      * @param opts Optional settings to control the behavior of the CustomResource.
      */
-    public static get(name: string, id: pulumi.Input<pulumi.ID>, opts?: pulumi.CustomResourceOptions): NodeClaim {
-        return new NodeClaim(name, undefined as any, { ...opts, id: id });
+    public static get(name: string, id: pulumi.Input<pulumi.ID>, opts?: pulumi.CustomResourceOptions): NodePoolPatch {
+        return new NodePoolPatch(name, undefined as any, { ...opts, id: id });
     }
 
     /** @internal */
-    public static readonly __pulumiType = 'kubernetes:karpenter.sh/v1:NodeClaim';
+    public static readonly __pulumiType = 'kubernetes:karpenter.sh/v1:NodePoolPatch';
 
     /**
-     * Returns true if the given object is an instance of NodeClaim.  This is designed to work even
+     * Returns true if the given object is an instance of NodePoolPatch.  This is designed to work even
      * when multiple copies of the Pulumi SDK have been loaded into the same process.
      */
-    public static isInstance(obj: any): obj is NodeClaim {
+    public static isInstance(obj: any): obj is NodePoolPatch {
         if (obj === undefined || obj === null) {
             return false;
         }
-        return obj['__pulumiType'] === NodeClaim.__pulumiType;
+        return obj['__pulumiType'] === NodePoolPatch.__pulumiType;
     }
 
     /**
@@ -43,27 +49,27 @@ export class NodeClaim extends pulumi.CustomResource {
     /**
      * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
      */
-    declare public readonly kind: pulumi.Output<"NodeClaim">;
+    declare public readonly kind: pulumi.Output<"NodePool">;
     /**
      * Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
      */
-    declare public readonly metadata: pulumi.Output<outputs.meta.v1.ObjectMeta>;
-    declare public readonly spec: pulumi.Output<outputs.karpenter.v1.NodeClaimSpec>;
-    declare public /*out*/ readonly status: pulumi.Output<outputs.karpenter.v1.NodeClaimStatus>;
+    declare public readonly metadata: pulumi.Output<outputs.meta.v1.ObjectMetaPatch>;
+    declare public readonly spec: pulumi.Output<outputs.karpenter.v1.NodePoolSpecPatch>;
+    declare public /*out*/ readonly status: pulumi.Output<outputs.karpenter.v1.NodePoolStatusPatch>;
 
     /**
-     * Create a NodeClaim resource with the given unique name, arguments, and options.
+     * Create a NodePoolPatch resource with the given unique name, arguments, and options.
      *
      * @param name The _unique_ name of the resource.
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(name: string, args?: NodeClaimArgs, opts?: pulumi.CustomResourceOptions) {
+    constructor(name: string, args?: NodePoolPatchArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
             resourceInputs["apiVersion"] = "karpenter.sh/v1";
-            resourceInputs["kind"] = "NodeClaim";
+            resourceInputs["kind"] = "NodePool";
             resourceInputs["metadata"] = args?.metadata;
             resourceInputs["spec"] = args?.spec;
             resourceInputs["status"] = undefined /*out*/;
@@ -75,14 +81,14 @@ export class NodeClaim extends pulumi.CustomResource {
             resourceInputs["status"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        super(NodeClaim.__pulumiType, name, resourceInputs, opts);
+        super(NodePoolPatch.__pulumiType, name, resourceInputs, opts);
     }
 }
 
 /**
- * The set of arguments for constructing a NodeClaim resource.
+ * The set of arguments for constructing a NodePoolPatch resource.
  */
-export interface NodeClaimArgs {
+export interface NodePoolPatchArgs {
     /**
      * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
      */
@@ -90,10 +96,10 @@ export interface NodeClaimArgs {
     /**
      * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
      */
-    kind?: pulumi.Input<"NodeClaim" | undefined>;
+    kind?: pulumi.Input<"NodePool" | undefined>;
     /**
      * Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
      */
-    metadata?: pulumi.Input<inputs.meta.v1.ObjectMeta | undefined>;
-    spec?: pulumi.Input<inputs.karpenter.v1.NodeClaimSpec | undefined>;
+    metadata?: pulumi.Input<inputs.meta.v1.ObjectMetaPatch | undefined>;
+    spec?: pulumi.Input<inputs.karpenter.v1.NodePoolSpecPatch | undefined>;
 }

@@ -6,8 +6,6 @@ import * as inputs from "../../types/input";
 import * as outputs from "../../types/output";
 import * as utilities from "../../utilities";
 
-import {ObjectMeta} from "../../meta/v1";
-
 /**
  * NodePool is the Schema for the NodePools API
  */
@@ -38,20 +36,20 @@ export class NodePool extends pulumi.CustomResource {
         return obj['__pulumiType'] === NodePool.__pulumiType;
     }
 
-    public readonly apiVersion!: pulumi.Output<"karpenter.sh/v1" | undefined>;
-    public readonly kind!: pulumi.Output<"NodePool" | undefined>;
-    public readonly metadata!: pulumi.Output<ObjectMeta | undefined>;
     /**
-     * NodePoolSpec is the top level nodepool specification. Nodepools
-     * launch nodes in response to pods that are unschedulable. A single nodepool
-     * is capable of managing a diverse set of nodes. Node properties are determined
-     * from a combination of nodepool and pod scheduling constraints.
+     * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
      */
-    public readonly spec!: pulumi.Output<outputs.karpenter.v1.NodePoolSpec>;
+    declare public readonly apiVersion: pulumi.Output<"karpenter.sh/v1">;
     /**
-     * NodePoolStatus defines the observed state of NodePool
+     * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
      */
-    public readonly status!: pulumi.Output<outputs.karpenter.v1.NodePoolStatus | undefined>;
+    declare public readonly kind: pulumi.Output<"NodePool">;
+    /**
+     * Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+     */
+    declare public readonly metadata: pulumi.Output<outputs.meta.v1.ObjectMeta>;
+    declare public readonly spec: pulumi.Output<outputs.karpenter.v1.NodePoolSpec>;
+    declare public /*out*/ readonly status: pulumi.Output<outputs.karpenter.v1.NodePoolStatus>;
 
     /**
      * Create a NodePool resource with the given unique name, arguments, and options.
@@ -66,9 +64,9 @@ export class NodePool extends pulumi.CustomResource {
         if (!opts.id) {
             resourceInputs["apiVersion"] = "karpenter.sh/v1";
             resourceInputs["kind"] = "NodePool";
-            resourceInputs["metadata"] = args ? args.metadata : undefined;
-            resourceInputs["spec"] = args ? (args.spec ? pulumi.output(args.spec).apply(inputs.karpenter.v1.nodePoolSpecArgsProvideDefaults) : undefined) : undefined;
-            resourceInputs["status"] = args ? (args.status ? pulumi.output(args.status).apply(inputs.karpenter.v1.nodePoolStatusArgsProvideDefaults) : undefined) : undefined;
+            resourceInputs["metadata"] = args?.metadata;
+            resourceInputs["spec"] = args?.spec;
+            resourceInputs["status"] = undefined /*out*/;
         } else {
             resourceInputs["apiVersion"] = undefined /*out*/;
             resourceInputs["kind"] = undefined /*out*/;
@@ -85,18 +83,17 @@ export class NodePool extends pulumi.CustomResource {
  * The set of arguments for constructing a NodePool resource.
  */
 export interface NodePoolArgs {
-    apiVersion?: pulumi.Input<"karpenter.sh/v1">;
-    kind?: pulumi.Input<"NodePool">;
-    metadata?: pulumi.Input<ObjectMeta>;
     /**
-     * NodePoolSpec is the top level nodepool specification. Nodepools
-     * launch nodes in response to pods that are unschedulable. A single nodepool
-     * is capable of managing a diverse set of nodes. Node properties are determined
-     * from a combination of nodepool and pod scheduling constraints.
+     * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
      */
-    spec?: pulumi.Input<inputs.karpenter.v1.NodePoolSpecArgs>;
+    apiVersion?: pulumi.Input<"karpenter.sh/v1" | undefined>;
     /**
-     * NodePoolStatus defines the observed state of NodePool
+     * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
      */
-    status?: pulumi.Input<inputs.karpenter.v1.NodePoolStatusArgs>;
+    kind?: pulumi.Input<"NodePool" | undefined>;
+    /**
+     * Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+     */
+    metadata?: pulumi.Input<inputs.meta.v1.ObjectMeta | undefined>;
+    spec?: pulumi.Input<inputs.karpenter.v1.NodePoolSpec | undefined>;
 }

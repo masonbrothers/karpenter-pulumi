@@ -10,15 +10,45 @@ export type EC2NodeClass = import("./ec2nodeClass").EC2NodeClass;
 export const EC2NodeClass: typeof import("./ec2nodeClass").EC2NodeClass = null as any;
 utilities.lazyLoad(exports, ["EC2NodeClass"], () => require("./ec2nodeClass"));
 
+export { EC2NodeClassListArgs } from "./ec2nodeClassList";
+export type EC2NodeClassList = import("./ec2nodeClassList").EC2NodeClassList;
+export const EC2NodeClassList: typeof import("./ec2nodeClassList").EC2NodeClassList = null as any;
+utilities.lazyLoad(exports, ["EC2NodeClassList"], () => require("./ec2nodeClassList"));
+
+export { EC2NodeClassPatchArgs } from "./ec2nodeClassPatch";
+export type EC2NodeClassPatch = import("./ec2nodeClassPatch").EC2NodeClassPatch;
+export const EC2NodeClassPatch: typeof import("./ec2nodeClassPatch").EC2NodeClassPatch = null as any;
+utilities.lazyLoad(exports, ["EC2NodeClassPatch"], () => require("./ec2nodeClassPatch"));
+
 export { NodeClaimArgs } from "./nodeClaim";
 export type NodeClaim = import("./nodeClaim").NodeClaim;
 export const NodeClaim: typeof import("./nodeClaim").NodeClaim = null as any;
 utilities.lazyLoad(exports, ["NodeClaim"], () => require("./nodeClaim"));
 
+export { NodeClaimListArgs } from "./nodeClaimList";
+export type NodeClaimList = import("./nodeClaimList").NodeClaimList;
+export const NodeClaimList: typeof import("./nodeClaimList").NodeClaimList = null as any;
+utilities.lazyLoad(exports, ["NodeClaimList"], () => require("./nodeClaimList"));
+
+export { NodeClaimPatchArgs } from "./nodeClaimPatch";
+export type NodeClaimPatch = import("./nodeClaimPatch").NodeClaimPatch;
+export const NodeClaimPatch: typeof import("./nodeClaimPatch").NodeClaimPatch = null as any;
+utilities.lazyLoad(exports, ["NodeClaimPatch"], () => require("./nodeClaimPatch"));
+
 export { NodePoolArgs } from "./nodePool";
 export type NodePool = import("./nodePool").NodePool;
 export const NodePool: typeof import("./nodePool").NodePool = null as any;
 utilities.lazyLoad(exports, ["NodePool"], () => require("./nodePool"));
+
+export { NodePoolListArgs } from "./nodePoolList";
+export type NodePoolList = import("./nodePoolList").NodePoolList;
+export const NodePoolList: typeof import("./nodePoolList").NodePoolList = null as any;
+utilities.lazyLoad(exports, ["NodePoolList"], () => require("./nodePoolList"));
+
+export { NodePoolPatchArgs } from "./nodePoolPatch";
+export type NodePoolPatch = import("./nodePoolPatch").NodePoolPatch;
+export const NodePoolPatch: typeof import("./nodePoolPatch").NodePoolPatch = null as any;
+utilities.lazyLoad(exports, ["NodePoolPatch"], () => require("./nodePoolPatch"));
 
 
 const _module = {
@@ -27,10 +57,22 @@ const _module = {
         switch (type) {
             case "kubernetes:karpenter.k8s.aws/v1:EC2NodeClass":
                 return new EC2NodeClass(name, <any>undefined, { urn })
+            case "kubernetes:karpenter.k8s.aws/v1:EC2NodeClassList":
+                return new EC2NodeClassList(name, <any>undefined, { urn })
+            case "kubernetes:karpenter.k8s.aws/v1:EC2NodeClassPatch":
+                return new EC2NodeClassPatch(name, <any>undefined, { urn })
             case "kubernetes:karpenter.sh/v1:NodeClaim":
                 return new NodeClaim(name, <any>undefined, { urn })
+            case "kubernetes:karpenter.sh/v1:NodeClaimList":
+                return new NodeClaimList(name, <any>undefined, { urn })
+            case "kubernetes:karpenter.sh/v1:NodeClaimPatch":
+                return new NodeClaimPatch(name, <any>undefined, { urn })
             case "kubernetes:karpenter.sh/v1:NodePool":
                 return new NodePool(name, <any>undefined, { urn })
+            case "kubernetes:karpenter.sh/v1:NodePoolList":
+                return new NodePoolList(name, <any>undefined, { urn })
+            case "kubernetes:karpenter.sh/v1:NodePoolPatch":
+                return new NodePoolPatch(name, <any>undefined, { urn })
             default:
                 throw new Error(`unknown resource type ${type}`);
         }

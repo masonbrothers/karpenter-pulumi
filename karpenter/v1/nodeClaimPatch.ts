@@ -7,33 +7,39 @@ import * as outputs from "../../types/output";
 import * as utilities from "../../utilities";
 
 /**
+ * Patch resources are used to modify existing Kubernetes resources by using
+ * Server-Side Apply updates. The name of the resource must be specified, but all other properties are optional. More than
+ * one patch may be applied to the same resource, and a random FieldManager name will be used for each Patch resource.
+ * Conflicts will result in an error by default, but can be forced using the "pulumi.com/patchForce" annotation. See the
+ * [Server-Side Apply Docs](https://www.pulumi.com/registry/packages/kubernetes/how-to-guides/managing-resources-with-server-side-apply/) for
+ * additional information about using Server-Side Apply to manage Kubernetes resources with Pulumi.
  * NodeClaim is the Schema for the NodeClaims API
  */
-export class NodeClaim extends pulumi.CustomResource {
+export class NodeClaimPatch extends pulumi.CustomResource {
     /**
-     * Get an existing NodeClaim resource's state with the given name, ID, and optional extra
+     * Get an existing NodeClaimPatch resource's state with the given name, ID, and optional extra
      * properties used to qualify the lookup.
      *
      * @param name The _unique_ name of the resulting resource.
      * @param id The _unique_ provider ID of the resource to lookup.
      * @param opts Optional settings to control the behavior of the CustomResource.
      */
-    public static get(name: string, id: pulumi.Input<pulumi.ID>, opts?: pulumi.CustomResourceOptions): NodeClaim {
-        return new NodeClaim(name, undefined as any, { ...opts, id: id });
+    public static get(name: string, id: pulumi.Input<pulumi.ID>, opts?: pulumi.CustomResourceOptions): NodeClaimPatch {
+        return new NodeClaimPatch(name, undefined as any, { ...opts, id: id });
     }
 
     /** @internal */
-    public static readonly __pulumiType = 'kubernetes:karpenter.sh/v1:NodeClaim';
+    public static readonly __pulumiType = 'kubernetes:karpenter.sh/v1:NodeClaimPatch';
 
     /**
-     * Returns true if the given object is an instance of NodeClaim.  This is designed to work even
+     * Returns true if the given object is an instance of NodeClaimPatch.  This is designed to work even
      * when multiple copies of the Pulumi SDK have been loaded into the same process.
      */
-    public static isInstance(obj: any): obj is NodeClaim {
+    public static isInstance(obj: any): obj is NodeClaimPatch {
         if (obj === undefined || obj === null) {
             return false;
         }
-        return obj['__pulumiType'] === NodeClaim.__pulumiType;
+        return obj['__pulumiType'] === NodeClaimPatch.__pulumiType;
     }
 
     /**
@@ -47,18 +53,18 @@ export class NodeClaim extends pulumi.CustomResource {
     /**
      * Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
      */
-    declare public readonly metadata: pulumi.Output<outputs.meta.v1.ObjectMeta>;
-    declare public readonly spec: pulumi.Output<outputs.karpenter.v1.NodeClaimSpec>;
-    declare public /*out*/ readonly status: pulumi.Output<outputs.karpenter.v1.NodeClaimStatus>;
+    declare public readonly metadata: pulumi.Output<outputs.meta.v1.ObjectMetaPatch>;
+    declare public readonly spec: pulumi.Output<outputs.karpenter.v1.NodeClaimSpecPatch>;
+    declare public /*out*/ readonly status: pulumi.Output<outputs.karpenter.v1.NodeClaimStatusPatch>;
 
     /**
-     * Create a NodeClaim resource with the given unique name, arguments, and options.
+     * Create a NodeClaimPatch resource with the given unique name, arguments, and options.
      *
      * @param name The _unique_ name of the resource.
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(name: string, args?: NodeClaimArgs, opts?: pulumi.CustomResourceOptions) {
+    constructor(name: string, args?: NodeClaimPatchArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
@@ -75,14 +81,14 @@ export class NodeClaim extends pulumi.CustomResource {
             resourceInputs["status"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        super(NodeClaim.__pulumiType, name, resourceInputs, opts);
+        super(NodeClaimPatch.__pulumiType, name, resourceInputs, opts);
     }
 }
 
 /**
- * The set of arguments for constructing a NodeClaim resource.
+ * The set of arguments for constructing a NodeClaimPatch resource.
  */
-export interface NodeClaimArgs {
+export interface NodeClaimPatchArgs {
     /**
      * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
      */
@@ -94,6 +100,6 @@ export interface NodeClaimArgs {
     /**
      * Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
      */
-    metadata?: pulumi.Input<inputs.meta.v1.ObjectMeta | undefined>;
-    spec?: pulumi.Input<inputs.karpenter.v1.NodeClaimSpec | undefined>;
+    metadata?: pulumi.Input<inputs.meta.v1.ObjectMetaPatch | undefined>;
+    spec?: pulumi.Input<inputs.karpenter.v1.NodeClaimSpecPatch | undefined>;
 }
