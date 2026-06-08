@@ -8,6 +8,7 @@
     "rootDir": ".",
     "strict": true,
     "target": "ES2022",
+    "useDefineForClassFields": false,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },

@@ -21,7 +21,8 @@
     "build": "tsc -p tsconfig.json",
     "generate:crds": "node ../crd2pulumi-package-tools/generate.mjs",
     "test": "vitest run",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "test:dist": "node test/dist-smoke.cjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json --noEmit"
   },
   "exports": {
     ".": {
