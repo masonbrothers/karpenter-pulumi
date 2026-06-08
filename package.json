@@ -4,6 +4,17 @@
   "description": "Pulumi TypeScript helpers for installing Karpenter on AWS EKS and declaring v1 NodePools.",
   "license": "MIT",
   "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/masonbrothers/karpenter-pulumi.git"
+  },
+  "bugs": {
+    "url": "https://github.com/masonbrothers/karpenter-pulumi/issues"
+  },
+  "homepage": "https://github.com/masonbrothers/karpenter-pulumi#readme",
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": ">=20.16.0"
   },
@@ -23,6 +34,7 @@
     "test": "vitest run",
     "test:dist": "node test/dist-smoke.cjs",
     "test:kind": "node ../crd2pulumi-package-tools/kubernetes-smoke.mjs",
+    "test:pack": "node ../crd2pulumi-package-tools/package-smoke.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json --noEmit"
   },
   "exports": {

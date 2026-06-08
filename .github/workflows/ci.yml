@@ -36,7 +36,9 @@ jobs:
         working-directory: package
       - run: pnpm generate:crds
         working-directory: package
-      - run: git diff --exit-code
+      - run: |
+          git status --short
+          test -z "$(git status --porcelain)"
         working-directory: package
       - uses: helm/kind-action@v1.14.0
         with:
@@ -51,6 +53,8 @@ jobs:
       - run: pnpm --if-present test
         working-directory: package
       - run: pnpm test:dist
+        working-directory: package
+      - run: pnpm test:pack
         working-directory: package
       - run: npm pack --dry-run
         working-directory: package

@@ -38,9 +38,13 @@ jobs:
           crd2pulumi --help >/dev/null
       - run: pnpm install --frozen-lockfile
         working-directory: package
+      - run: node -e 'const pkg = require("./package.json"); const tag = process.env.GITHUB_REF_NAME; const allowed = new Set([pkg.version, `v${pkg.version}`, `${pkg.name}@${pkg.version}`, `${pkg.name}-${pkg.version}`, `${pkg.name}-v${pkg.version}`]); if (!allowed.has(tag)) { console.error(`Release tag ${tag} does not match ${pkg.name} version ${pkg.version}`); process.exit(1); }'
+        working-directory: package
       - run: pnpm generate:crds
         working-directory: package
-      - run: git diff --exit-code
+      - run: |
+          git status --short
+          test -z "$(git status --porcelain)"
         working-directory: package
       - uses: helm/kind-action@v1.14.0
         with:
@@ -55,6 +59,8 @@ jobs:
       - run: pnpm --if-present test
         working-directory: package
       - run: pnpm test:dist
+        working-directory: package
+      - run: pnpm test:pack
         working-directory: package
       - run: npm pack --dry-run
         working-directory: package
