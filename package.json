@@ -2,7 +2,7 @@
   "name": "karpenter-pulumi",
   "version": "0.1.0",
   "description": "Pulumi TypeScript helpers for installing Karpenter on AWS EKS and declaring v1 NodePools.",
-  "license": "MIT",
+  "license": "MIT AND Apache-2.0",
   "private": false,
   "repository": {
     "type": "git",
@@ -26,15 +26,18 @@
     "crd2pulumi.config.mjs",
     "dist",
     "LICENSE.md",
-    "README.md"
+    "README.md",
+    "THIRD_PARTY_LICENSES",
+    "THIRD_PARTY_NOTICES.md"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "generate:crds": "node ../crd2pulumi-package-tools/generate.mjs",
+    "clean": "node -e \"require('node:fs').rmSync('dist', { force: true, recursive: true })\"",
+    "build": "pnpm clean && tsc -p tsconfig.json",
+    "generate:crds": "generate-crd2pulumi-package",
     "test": "vitest run",
     "test:dist": "node test/dist-smoke.cjs",
-    "test:kind": "node ../crd2pulumi-package-tools/kubernetes-smoke.mjs",
-    "test:pack": "node ../crd2pulumi-package-tools/package-smoke.mjs",
+    "test:kind": "smoke-crd2pulumi-kubernetes",
+    "test:pack": "smoke-crd2pulumi-package",
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json --noEmit"
   },
   "exports": {
@@ -67,6 +70,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.8.1",
+    "crd2pulumi-package-tools": "github:masonbrothers/crd2pulumi-package-tools#d82813ab4e8def5e1aa04085be7832f5bd628246",
     "typescript": "^5.9.3",
     "vitest": "^4.0.7"
   }

@@ -308,7 +308,7 @@ export class AwsKarpenter extends pulumi.ComponentResource {
 }
 
 export function cloudFormationTemplateUrl(karpenterVersion: string): string {
-  return `https://raw.githubusercontent.com/aws/karpenter-provider-aws/v${karpenterVersion}/website/content/en/preview/getting-started/getting-started-with-karpenter/cloudformation.yaml`;
+  return `https://raw.githubusercontent.com/aws/karpenter-provider-aws/v${karpenterVersion}/website/content/en/docs/getting-started/getting-started-with-karpenter/cloudformation.yaml`;
 }
 
 async function fetchCloudFormationTemplate(

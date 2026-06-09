@@ -24,6 +24,9 @@ importers:
       '@types/node':
         specifier: ^22.8.1
         version: 22.19.20
+      crd2pulumi-package-tools:
+        specifier: github:masonbrothers/crd2pulumi-package-tools#d82813ab4e8def5e1aa04085be7832f5bd628246
+        version: https://codeload.github.com/masonbrothers/crd2pulumi-package-tools/tar.gz/d82813ab4e8def5e1aa04085be7832f5bd628246
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -569,6 +572,12 @@ packages:
 
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
+
+  crd2pulumi-package-tools@https://codeload.github.com/masonbrothers/crd2pulumi-package-tools/tar.gz/d82813ab4e8def5e1aa04085be7832f5bd628246:
+    resolution: {tarball: https://codeload.github.com/masonbrothers/crd2pulumi-package-tools/tar.gz/d82813ab4e8def5e1aa04085be7832f5bd628246}
+    version: 0.1.0
+    engines: {node: '>=20.16.0'}
+    hasBin: true
 
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
@@ -1980,6 +1989,8 @@ snapshots:
   common-ancestor-path@2.0.0: {}
 
   convert-source-map@2.0.0: {}
+
+  crd2pulumi-package-tools@https://codeload.github.com/masonbrothers/crd2pulumi-package-tools/tar.gz/d82813ab4e8def5e1aa04085be7832f5bd628246: {}
 
   cross-spawn@7.0.6:
     dependencies:

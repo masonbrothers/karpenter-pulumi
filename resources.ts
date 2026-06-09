@@ -112,12 +112,12 @@ export function createEc2NodeClassManifest(
 export function createNodePoolManifest(
   args: CreateNodePoolManifestArgs,
 ): NodePoolArgs {
-  const requirements = [
+  const requirements = mergeRequirements([
     requirement("kubernetes.io/arch", args.architectures ?? ["amd64"]),
     requirement("kubernetes.io/os", args.operatingSystems ?? ["linux"]),
     requirement("karpenter.sh/capacity-type", args.capacityTypes ?? ["spot"]),
     ...(args.requirements ?? []),
-  ];
+  ]);
 
   return stripUndefined({
     apiVersion: "karpenter.sh/v1",
@@ -172,6 +172,34 @@ function requirement(key: string, values: string[]): Requirement {
     operator: "In",
     values: [...values],
   };
+}
+
+function mergeRequirements(requirements: Requirement[]): Requirement[] {
+  const merged: Requirement[] = [];
+  const indexesByKey = new Map<string, number>();
+
+  for (const requirement of requirements) {
+    const key = requirementKey(requirement);
+    if (!key) {
+      merged.push(requirement);
+      continue;
+    }
+
+    const existingIndex = indexesByKey.get(key);
+    if (existingIndex === undefined) {
+      indexesByKey.set(key, merged.length);
+      merged.push(requirement);
+    } else {
+      merged[existingIndex] = requirement;
+    }
+  }
+
+  return merged;
+}
+
+function requirementKey(requirement: Requirement): string | undefined {
+  const key = (requirement as { readonly key?: unknown }).key;
+  return typeof key === "string" ? key : undefined;
 }
 
 function stripUndefined<T>(value: T): T {

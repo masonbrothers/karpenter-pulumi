@@ -115,6 +115,56 @@ describe("Karpenter v1 manifests", () => {
     });
   });
 
+  it("lets caller requirements replace default requirements by key", () => {
+    const manifest = createNodePoolManifest({
+      name: "default",
+      nodeClassName: "default",
+      requirements: [
+        {
+          key: "karpenter.sh/capacity-type",
+          operator: "In",
+          values: ["on-demand"],
+        },
+        {
+          key: "topology.kubernetes.io/zone",
+          operator: "In",
+          values: ["us-east-1a"],
+        },
+      ],
+    });
+
+    const spec = manifest.spec as {
+      readonly template?: {
+        readonly spec?: {
+          readonly requirements?: unknown;
+        };
+      };
+    };
+
+    expect(spec.template?.spec?.requirements).toEqual([
+      {
+        key: "kubernetes.io/arch",
+        operator: "In",
+        values: ["amd64"],
+      },
+      {
+        key: "kubernetes.io/os",
+        operator: "In",
+        values: ["linux"],
+      },
+      {
+        key: "karpenter.sh/capacity-type",
+        operator: "In",
+        values: ["on-demand"],
+      },
+      {
+        key: "topology.kubernetes.io/zone",
+        operator: "In",
+        values: ["us-east-1a"],
+      },
+    ]);
+  });
+
   it("tracks current Karpenter defaults", () => {
     expect(defaultKarpenterVersion).toBe("1.12.1");
     expect(defaultControllerPolicyNames).toEqual([
