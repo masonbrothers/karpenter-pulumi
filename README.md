@@ -99,6 +99,38 @@ The CRDs currently come from `aws/karpenter-provider-aws` tag `v1.12.1`.
 Local regeneration uses the shared `crd2pulumi-package-tools` package installed
 by `pnpm install`; `crd2pulumi` must also be available on `PATH`.
 
+## Optional chart signature verification
+
+Set `verifyChartSignature: true` to run Karpenter's documented cosign
+verification for the OCI Helm chart before Pulumi registers the Helm chart
+resource. This is disabled by default so projects that do not install `cosign`
+continue to work.
+
+```ts
+new AwsKarpenter("karpenter", {
+  clusterName,
+  k8sProvider: provider,
+  oidcProvider: cluster.core.oidcProvider,
+  verifyChartSignature: true,
+});
+```
+
+The Pulumi runner must have `cosign` on `PATH`. Advanced callers can customize
+the binary path, artifact reference, workflow certificate constraints, and extra
+cosign arguments:
+
+```ts
+new AwsKarpenter("karpenter", {
+  clusterName,
+  k8sProvider: provider,
+  oidcProvider: cluster.core.oidcProvider,
+  verifyChartSignature: {
+    cosignPath: "/usr/local/bin/cosign",
+    extraArgs: ["--certificate-github-workflow-sha=<expected-sha>"],
+  },
+});
+```
+
 ## Publish
 
 GitHub Actions runs install, CRD regeneration, typecheck, build, and tests.

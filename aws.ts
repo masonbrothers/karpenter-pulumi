@@ -1,3 +1,5 @@
+import { spawnSync } from "node:child_process";
+
 import * as aws from "@pulumi/aws";
 import * as awsnative from "@pulumi/aws-native";
 import * as k8s from "@pulumi/kubernetes";
@@ -46,6 +48,9 @@ export interface AwsKarpenterArgs {
   readonly serviceAccountName?: string;
   readonly serviceAccountRoleName?: string;
   readonly settings?: Record<string, unknown>;
+  readonly verifyChartSignature?:
+    | boolean
+    | KarpenterChartSignatureVerificationArgs;
 }
 
 export interface ControllerResourceRequirements {
@@ -58,6 +63,36 @@ export interface ControllerResourceRequirements {
     readonly memory?: string;
   };
 }
+
+export interface KarpenterChartSignatureVerificationArgs {
+  readonly enabled?: boolean;
+  readonly cosignPath?: string;
+  readonly artifactRef?: string;
+  readonly certificateOidcIssuer?: string;
+  readonly certificateIdentityRegExp?: string;
+  readonly certificateGitHubWorkflowRepository?: string;
+  readonly certificateGitHubWorkflowName?: string;
+  readonly certificateGitHubWorkflowRef?: string;
+  readonly annotations?: Record<string, string>;
+  readonly extraArgs?: readonly string[];
+}
+
+export interface KarpenterCosignVerifyCommand {
+  readonly command: string;
+  readonly args: readonly string[];
+  readonly artifactRef: string;
+}
+
+export interface CosignCommandResult {
+  readonly status: number | null;
+  readonly signal?: NodeJS.Signals | null;
+  readonly error?: Error;
+}
+
+export type CosignCommandRunner = (
+  command: string,
+  args: readonly string[],
+) => CosignCommandResult;
 
 export class AwsKarpenter extends pulumi.ComponentResource {
   public readonly accessEntry?: awsnative.eks.AccessEntry;
@@ -217,6 +252,11 @@ export class AwsKarpenter extends pulumi.ComponentResource {
       );
     }
 
+    verifyKarpenterChartSignature(
+      karpenterVersion,
+      args.verifyChartSignature,
+    );
+
     this.chart = new k8s.helm.v4.Chart(
       `${name}-chart`,
       {
@@ -311,6 +351,94 @@ export function cloudFormationTemplateUrl(karpenterVersion: string): string {
   return `https://raw.githubusercontent.com/aws/karpenter-provider-aws/v${karpenterVersion}/website/content/en/docs/getting-started/getting-started-with-karpenter/cloudformation.yaml`;
 }
 
+export function buildKarpenterCosignVerifyCommand(
+  karpenterVersion: string,
+  verification: boolean | KarpenterChartSignatureVerificationArgs | undefined,
+): KarpenterCosignVerifyCommand | undefined {
+  if (!verification) {
+    return undefined;
+  }
+
+  const options = verification === true ? {} : verification;
+  if (options.enabled === false) {
+    return undefined;
+  }
+
+  const version = stripLeadingV(karpenterVersion);
+  const tag = `v${version}`;
+  const annotations = {
+    version,
+    ...(options.annotations ?? {}),
+  };
+  const artifactRef =
+    options.artifactRef ?? `public.ecr.aws/karpenter/karpenter:${version}`;
+  const args = [
+    "verify",
+    artifactRef,
+    `--certificate-oidc-issuer=${
+      options.certificateOidcIssuer ??
+      "https://token.actions.githubusercontent.com"
+    }`,
+    `--certificate-identity-regexp=${
+      options.certificateIdentityRegExp ??
+      "https://github\\.com/aws/karpenter-provider-aws/\\.github/workflows/release\\.yaml@.+"
+    }`,
+    `--certificate-github-workflow-repository=${
+      options.certificateGitHubWorkflowRepository ??
+      "aws/karpenter-provider-aws"
+    }`,
+    `--certificate-github-workflow-name=${
+      options.certificateGitHubWorkflowName ?? "Release"
+    }`,
+    `--certificate-github-workflow-ref=${
+      options.certificateGitHubWorkflowRef ?? `refs/tags/${tag}`
+    }`,
+    ...Object.entries(annotations).map(
+      ([key, value]) => `--annotations=${key}=${value}`,
+    ),
+    ...(options.extraArgs ?? []),
+  ];
+
+  return {
+    args,
+    artifactRef,
+    command: options.cosignPath ?? "cosign",
+  };
+}
+
+export function verifyKarpenterChartSignature(
+  karpenterVersion: string,
+  verification: boolean | KarpenterChartSignatureVerificationArgs | undefined,
+  runCommand: CosignCommandRunner = runCosignCommand,
+): void {
+  const verifyCommand = buildKarpenterCosignVerifyCommand(
+    karpenterVersion,
+    verification,
+  );
+
+  if (!verifyCommand) {
+    return;
+  }
+
+  const result = runCommand(verifyCommand.command, verifyCommand.args);
+
+  if (result.error) {
+    throw new Error(
+      `Cannot run cosign to verify Karpenter chart ${verifyCommand.artifactRef}: ${result.error.message}. Install cosign or disable verifyChartSignature.`,
+    );
+  }
+
+  if (result.status !== 0) {
+    const status =
+      result.status === null
+        ? `signal ${result.signal ?? "unknown"}`
+        : `exit ${result.status}`;
+    throw new Error(
+      `cosign failed to verify Karpenter chart ${verifyCommand.artifactRef} (${status})`,
+    );
+  }
+}
+
 async function fetchCloudFormationTemplate(
   karpenterVersion: string,
   overrideUrl?: string,
@@ -363,4 +491,15 @@ function controllerResources(resources?: ControllerResourceRequirements) {
       memory: resources?.requests?.memory ?? "1Gi",
     },
   };
+}
+
+function runCosignCommand(
+  command: string,
+  args: readonly string[],
+): CosignCommandResult {
+  return spawnSync(command, [...args], { stdio: "inherit" });
+}
+
+function stripLeadingV(version: string): string {
+  return version.replace(/^v/, "");
 }

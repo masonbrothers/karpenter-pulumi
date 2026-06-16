@@ -2,7 +2,12 @@ import * as k8s from "@pulumi/kubernetes";
 import * as pulumi from "@pulumi/pulumi";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { AwsKarpenter, cloudFormationTemplateUrl } from "../aws";
+import {
+  AwsKarpenter,
+  buildKarpenterCosignVerifyCommand,
+  cloudFormationTemplateUrl,
+  verifyKarpenterChartSignature,
+} from "../aws";
 
 interface MockResource {
   readonly type: string;
@@ -67,6 +72,76 @@ describe("AwsKarpenter", () => {
   it("builds a stable CloudFormation template URL for the pinned release docs", () => {
     expect(cloudFormationTemplateUrl("1.12.1")).toBe(
       "https://raw.githubusercontent.com/aws/karpenter-provider-aws/v1.12.1/website/content/en/docs/getting-started/getting-started-with-karpenter/cloudformation.yaml",
+    );
+  });
+
+  it("builds the documented cosign command for the Karpenter OCI chart", () => {
+    expect(buildKarpenterCosignVerifyCommand("1.12.1", true)).toEqual({
+      artifactRef: "public.ecr.aws/karpenter/karpenter:1.12.1",
+      command: "cosign",
+      args: [
+        "verify",
+        "public.ecr.aws/karpenter/karpenter:1.12.1",
+        "--certificate-oidc-issuer=https://token.actions.githubusercontent.com",
+        "--certificate-identity-regexp=https://github\\.com/aws/karpenter-provider-aws/\\.github/workflows/release\\.yaml@.+",
+        "--certificate-github-workflow-repository=aws/karpenter-provider-aws",
+        "--certificate-github-workflow-name=Release",
+        "--certificate-github-workflow-ref=refs/tags/v1.12.1",
+        "--annotations=version=1.12.1",
+      ],
+    });
+  });
+
+  it("allows the cosign command to be disabled or customized", () => {
+    expect(
+      buildKarpenterCosignVerifyCommand("1.12.1", { enabled: false }),
+    ).toBeUndefined();
+    expect(
+      buildKarpenterCosignVerifyCommand("v1.12.1", {
+        artifactRef: "registry.example.test/karpenter:1.12.1",
+        certificateGitHubWorkflowRef: "refs/tags/custom",
+        cosignPath: "/usr/local/bin/cosign",
+        extraArgs: ["--certificate-github-workflow-sha=abc123"],
+      }),
+    ).toMatchObject({
+      artifactRef: "registry.example.test/karpenter:1.12.1",
+      command: "/usr/local/bin/cosign",
+      args: expect.arrayContaining([
+        "registry.example.test/karpenter:1.12.1",
+        "--certificate-github-workflow-ref=refs/tags/custom",
+        "--certificate-github-workflow-sha=abc123",
+      ]),
+    });
+  });
+
+  it("runs cosign only when chart signature verification is enabled", () => {
+    const runCommand = vi.fn(() => ({ status: 0 }));
+
+    verifyKarpenterChartSignature("1.12.1", undefined, runCommand);
+    expect(runCommand).not.toHaveBeenCalled();
+
+    verifyKarpenterChartSignature("1.12.1", true, runCommand);
+    expect(runCommand).toHaveBeenCalledWith(
+      "cosign",
+      expect.arrayContaining([
+        "verify",
+        "public.ecr.aws/karpenter/karpenter:1.12.1",
+      ]),
+    );
+  });
+
+  it("fails clearly when cosign cannot verify the chart", () => {
+    expect(() =>
+      verifyKarpenterChartSignature("1.12.1", true, () => ({
+        error: new Error("spawn cosign ENOENT"),
+        status: null,
+      })),
+    ).toThrow(/Install cosign or disable verifyChartSignature/);
+
+    expect(() =>
+      verifyKarpenterChartSignature("1.12.1", true, () => ({ status: 1 })),
+    ).toThrow(
+      /cosign failed to verify Karpenter chart public\.ecr\.aws\/karpenter\/karpenter:1\.12\.1/,
     );
   });
 
