@@ -8,6 +8,7 @@
     "strict": true,
     "target": "ES2022",
     "useDefineForClassFields": false,
+    "ignoreDeprecations": "6.0",
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },

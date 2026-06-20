@@ -69,9 +69,9 @@
     "@pulumi/pulumi": ">=3.144.0 <5"
   },
   "devDependencies": {
-    "@types/node": "^22.8.1",
+    "@types/node": "^26.0.0",
     "crd2pulumi-package-tools": "github:masonbrothers/crd2pulumi-package-tools#d82813ab4e8def5e1aa04085be7832f5bd628246",
-    "typescript": "^5.9.3",
-    "vitest": "^4.0.7"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
   }
 }
